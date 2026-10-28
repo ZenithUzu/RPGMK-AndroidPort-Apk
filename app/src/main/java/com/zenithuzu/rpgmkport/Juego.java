@@ -167,7 +167,13 @@ public final class Juego
 
     // ------------------------------------------------------------------ leer datos
 
-    private static final Pattern LEEME = Pattern.compile("^(read ?me|l[eé]e ?me|l[eé]ame|cr[eé]ditos|credits|info|instrucciones|leia-me)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern LEEME = Pattern.compile("^(read ?me|l[eé]e ?me|l[eé]ame|cr[eé]ditos|credits|info|instrucciones|leia-me"
+        + "|change ?log|cambios|novedades|versi[oó]n|notas)", Pattern.CASE_INSENSITIVE);
+    // Líneas que hablan del motor y no del juego ("Hecho con Essentials v20.1"): no dan autor ni versión
+    private static final Pattern MOTOR = Pattern.compile("essentials|rpg ?maker|mkxp|joiplay|kirin|\\brgss|\\bruby\\b", Pattern.CASE_INSENSITIVE);
+    // Carpetas del juego donde no hay textos (no se revisan)
+    private static final java.util.Set<String> CARPETAS_JUEGO = new java.util.HashSet<>(Arrays.asList(
+        "graphics", "audio", "data", "fonts", "plugins", "save", "saves"));
     private static final Pattern[] AUTOR = {
         Pattern.compile("^\\W*(?:(?:an?|un)\\s+(?:game|juego|fangame)\\s+)?(?:hecho|creado|desarrollado|programado|made|created|developed|programmed)\\s+(?:por|by)\\s*[:\\-]?\\s*(.+)$", Pattern.CASE_INSENSITIVE),
         Pattern.compile("^\\W*(?:autor(?:es|a)?|author(?:s)?|creador(?:es|a)?|creator(?:s)?|desarrollador(?:es|a)?|developer(?:s)?|dev)\\s*[:\\-]\\s*(.+)$", Pattern.CASE_INSENSITIVE),
@@ -189,11 +195,11 @@ public final class Juego
                 if (m.find())
                     info.titulo = m.group(1);
             }
-        for (File f : hijos) {
-            if (!f.isFile() || !LEEME.matcher(f.getName()).find())
-                continue;
+        for (File f : textos(hijos)) {
             for (String linea : leerTexto(f).split("\\r?\\n")) {
                 linea = linea.trim();
+                if (MOTOR.matcher(linea).find())
+                    continue;
                 if (info.autor.isEmpty())
                     for (Pattern p : AUTOR) {
                         Matcher m = p.matcher(linea);
@@ -217,6 +223,27 @@ public final class Juego
             info.version = m.find() ? m.group(1) : "1.0";
         }
         return info;
+    }
+
+    /** Léeme, créditos, cambios... en la carpeta del juego y un nivel más adentro (ej. Docs/). */
+    private static java.util.List<File> textos(File[] hijos)
+    {
+        java.util.List<File> l = new java.util.ArrayList<>();
+        for (File f : hijos)
+            if (f.isFile() && LEEME.matcher(f.getName()).find())
+                l.add(f);
+        for (File d : hijos) {
+            if (!d.isDirectory() || CARPETAS_JUEGO.contains(d.getName().toLowerCase(Locale.ROOT)))
+                continue;
+            File[] dentro = d.listFiles();
+            if (dentro == null)
+                continue;
+            Arrays.sort(dentro);
+            for (File f : dentro)
+                if (f.isFile() && LEEME.matcher(f.getName()).find())
+                    l.add(f);
+        }
+        return l;
     }
 
     /** Lee un texto en UTF-8 o, si no lo es, en la codificación de Windows. Quita formato RTF. */
