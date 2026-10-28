@@ -1,0 +1,44 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.zenithuzu.rpgmkport'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'com.zenithuzu.rpgmkport'
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName '0.1'
+    }
+
+    // Llave fija (la de depuración pública de Android, guardada en el repo): así cada versión
+    // nueva se instala encima de la anterior. Los APK de los juegos usan otra firma, la del autor.
+    signingConfigs {
+        fija {
+            storeFile file('firma-app.jks')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+    }
+    buildTypes {
+        debug { signingConfig signingConfigs.fija }
+        release {
+            signingConfig signingConfigs.fija
+            minifyEnabled false
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.documentfile:documentfile:1.0.1'
+}

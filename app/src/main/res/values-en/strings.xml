@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bienvenido">Welcome</string>
+    <string name="titulo_app">RPG Maker fangames on Android</string>
+    <string name="intro">Turn an RPG Maker XP, VX or VX Ace fangame (like the ones made with Pokémon Essentials) into its own app, right from your phone. No PC, JoiPlay or Kirin needed: each game becomes an app with its own name, icon and its author\'s signature.\n\nIt uses the same engine as RMXP-Android-Ports (mkxp-z): the game really runs, there is no emulated Windows.\n\nStill in development. If something fails, save the log and report it on GitHub.</string>
+    <string name="empezar">Get started</string>
+    <string name="continuar">Continue</string>
+    <string name="atras">Back</string>
+    <string name="paso">Step %1$d of %2$d</string>
+
+    <string name="juego_titulo">Choose the game</string>
+    <string name="juego_texto">You need the PC game files: the folder with Game.ini, or the .zip as you downloaded it. It is copied into this app; the original is not touched.</string>
+    <string name="importar_zip">Import a .zip</string>
+    <string name="importar_zip_sub">The file as you downloaded it</string>
+    <string name="elegir_carpeta">Choose a folder</string>
+    <string name="elegir_carpeta_sub">If it is already unzipped</string>
+    <string name="copiando">Copying… %1$d files</string>
+    <string name="sin_game_ini">Game.ini not found. Choose the game folder (or a .zip that has it).</string>
+    <string name="error">Could not do it: %1$s</string>
+    <string name="juego_listo">%1$s · %2$s</string>
+    <string name="falta_juego">Choose a game to continue</string>
+
+    <string name="datos_titulo">Check the details</string>
+    <string name="datos_texto">Taken from the game and its Readme. The author goes into the app\'s signature; type it if it is missing.</string>
+    <string name="nombre">Name</string>
+    <string name="autor">Author</string>
+    <string name="version">Version</string>
+    <string name="icono">Icon</string>
+    <string name="icono_sub">A square PNG (optional)</string>
+    <string name="ahorrar">Save space (experimental)</string>
+    <string name="ahorrar_sub">Pictures and music are read from the APK instead of being copied</string>
+
+    <string name="crear_titulo">Create the app</string>
+    <string name="crear_texto">The APK is put together with the ready-made engine, signed in the author\'s name and installed.</string>
+    <string name="crear">Create and install</string>
+    <string name="en_construccion">This part comes in the next update.</string>
+</resources>

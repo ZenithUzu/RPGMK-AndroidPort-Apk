@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Material You: en Android 12+ los colores salen del fondo de pantalla (DynamicColors en App.java) -->
+    <style name="Theme.RpgmkPort" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/semilla</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="Rpg.Etiqueta" parent="">
+        <item name="android:textAppearance">?attr/textAppearanceLabelLarge</item>
+        <item name="android:letterSpacing">0.25</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="Rpg.Titulo" parent="">
+        <item name="android:textAppearance">?attr/textAppearanceHeadlineMedium</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="Rpg.Cuerpo" parent="">
+        <item name="android:textAppearance">?attr/textAppearanceBodyLarge</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+        <item name="android:lineSpacingMultiplier">1.15</item>
+    </style>
+
+    <style name="Rpg.Boton" parent="Widget.Material3.Button">
+        <item name="android:minHeight">60dp</item>
+        <item name="android:textAppearance">?attr/textAppearanceTitleMedium</item>
+    </style>
+</resources>

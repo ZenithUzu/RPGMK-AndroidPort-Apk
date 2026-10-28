@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RPGMK Port</string>
+    <string name="bienvenido">Bienvenido</string>
+    <string name="titulo_app">Fangames de RPG Maker en Android</string>
+    <string name="intro">Convierte un fangame de RPG Maker XP, VX o VX Ace (como los hechos con Pokémon Essentials) en una app propia, desde el teléfono. No hace falta PC, JoiPlay ni Kirin: cada juego queda como una app con su nombre, su icono y la firma de su autor.\n\nUsa el mismo motor que RMXP-Android-Ports (mkxp-z): el juego corre de verdad, no hay Windows emulado.\n\nSigue en desarrollo. Si algo falla, guarda el registro (log) y repórtalo en GitHub.</string>
+    <string name="empezar">Empezar</string>
+    <string name="continuar">Continuar</string>
+    <string name="atras">Atrás</string>
+    <string name="paso">Paso %1$d de %2$d</string>
+
+    <string name="juego_titulo">Elige el juego</string>
+    <string name="juego_texto">Necesitas los archivos del juego para PC: la carpeta que trae Game.ini, o el .zip tal como lo descargaste. Se copia dentro de esta app; el original no se toca.</string>
+    <string name="importar_zip">Importar un .zip</string>
+    <string name="importar_zip_sub">El archivo tal como lo descargaste</string>
+    <string name="elegir_carpeta">Elegir una carpeta</string>
+    <string name="elegir_carpeta_sub">Si ya lo tienes descomprimido</string>
+    <string name="copiando">Copiando… %1$d archivos</string>
+    <string name="sin_game_ini">No encontré Game.ini. Elige la carpeta del juego (o un .zip que la tenga).</string>
+    <string name="error">No se pudo: %1$s</string>
+    <string name="juego_listo">%1$s · %2$s</string>
+    <string name="falta_juego">Elige un juego para continuar</string>
+
+    <string name="datos_titulo">Revisa los datos</string>
+    <string name="datos_texto">Salen del juego y de su Léeme. El autor va en la firma de la app; si no aparece, escríbelo.</string>
+    <string name="nombre">Nombre</string>
+    <string name="autor">Autor</string>
+    <string name="version">Versión</string>
+    <string name="icono">Icono</string>
+    <string name="icono_sub">Un PNG cuadrado (opcional)</string>
+    <string name="ahorrar">Ahorrar espacio (experimental)</string>
+    <string name="ahorrar_sub">Las imágenes y la música se leen del APK en vez de copiarse</string>
+
+    <string name="crear_titulo">Crear la app</string>
+    <string name="crear_texto">Se arma el APK con el motor ya listo, se firma a nombre del autor y se instala.</string>
+    <string name="crear">Crear e instalar</string>
+    <string name="en_construccion">Esta parte llega en la siguiente actualización.</string>
+</resources>

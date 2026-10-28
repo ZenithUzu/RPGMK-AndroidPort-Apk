@@ -1,0 +1,30 @@
+# Compila la app y la publica en la versión "ultima" (para descargarla desde el teléfono)
+name: APK
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: android-actions/setup-android@v3
+      - name: Compilar
+        run: ./gradlew --no-daemon assembleRelease
+      - name: Publicar
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/release/app-release.apk RPGMK-Port.apk
+          gh release delete ultima --yes --cleanup-tag || true
+          gh release create ultima RPGMK-Port.apk --title "Última versión" \
+            --notes "Compilada de ${GITHUB_SHA::7}. Descarga RPGMK-Port.apk desde el teléfono e instálala."
