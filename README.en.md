@@ -10,8 +10,7 @@ It's the phone version of [RMXP-Android-Ports](https://github.com/ZenithUzu/RMXP
 (the Windows tool) and uses the same engine, **mkxp-z**: the game really runs, there is no
 emulated Windows.
 
-> **Status: in development.** Choosing the game and checking its details already works.
-> Building and installing the APK come in the next parts.
+> **Status: testing.** It already builds, signs and installs the APK. It still needs testing on more phones and games.
 
 ## How to use it
 
@@ -21,7 +20,12 @@ emulated Windows.
    It's copied into the app; the original isn't touched.
 4. **Check the details**: name, author (goes into the signature), version and icon, taken
    from `Game.ini` and the game's Readme.
-5. **Create and install** *(coming soon)*.
+5. **Signature**: if you already made the game on the PC, use **Import signature from PC**
+   and pick `juego.json` and `firma.jks` from `RMXP-Android-Ports\juegos\<game>`. Then the
+   new APK installs **over** the PC one without losing saves. Otherwise a new signature is
+   created in the author's name; back it up with **Export signature**.
+6. **Create and install**: builds the APK, signs it and Android asks you to install it. You
+   can also **Save the APK** to move it to another phone.
 
 The app uses your wallpaper colors (Material You, Android 12 or newer).
 
@@ -38,8 +42,8 @@ engine); only the game files, name, icon, id and signature change. So the app:
 | Part | What it does | Status |
 |---|---|---|
 | 1 | UI, importing the game (.zip or folder), reading its details | Done |
-| 2 | APK template and building the APK with the game | Pending |
-| 3 | Per-game signature, install, update without losing saves | Pending |
+| 2 | APK template and building the APK with the game | Done |
+| 3 | Per-game signature (PC-compatible), install, update | Done |
 
 ## For developers
 
@@ -47,6 +51,8 @@ engine); only the game files, name, icon, id and signature change. So the app:
 app/src/main/java/com/zenithuzu/rpgmkport/
   MainActivity.java   step-by-step wizard
   Juego.java          imports the game and reads name, author and version
+  Constructor.java    builds the APK from the template (ARSCLib) and signs it (apksig)
+  Firma.java          per-game signature, same format as the PC (firma.jks + juego.json)
 .github/workflows/apk.yml   builds and publishes the "ultima" release
 ```
 
@@ -56,6 +62,8 @@ so each new version installs over the previous one). Game APKs are signed with a
 different key, each author's.
 
 ## Credits
+
+- [ARSCLib](https://github.com/REAndroid/ARSCLib) (Apache-2.0) and [apksig](https://android.googlesource.com/platform/tools/apksig) (Apache-2.0): editing and signing the APK on the phone.
 
 - [RMXP-Android-Ports](https://github.com/ZenithUzu/RMXP-Android-Ports): engine, controls,
   menu and patches shipped with each game.

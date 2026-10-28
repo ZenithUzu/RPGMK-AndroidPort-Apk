@@ -11,8 +11,7 @@ Es la versión para teléfono de [RMXP-Android-Ports](https://github.com/ZenithU
 (la herramienta para Windows) y usa su mismo motor, **mkxp-z**: el juego corre de verdad,
 no hay Windows emulado.
 
-> **Estado: en desarrollo.** Ya funciona la parte de elegir el juego y revisar sus datos.
-> Armar e instalar el APK llega en las siguientes partes.
+> **Estado: en pruebas.** Ya arma, firma e instala el APK. Falta probarlo en más teléfonos y juegos.
 
 ## Cómo se usa
 
@@ -22,7 +21,12 @@ no hay Windows emulado.
    Se copia dentro de la app; el original no se toca.
 4. **Revisa los datos**: nombre, autor (va en la firma), versión e icono. Salen del
    `Game.ini` y del Léeme del juego.
-5. **Crear e instalar** *(próximamente)*.
+5. **Firma**: si el juego ya lo hiciste en la PC, usa **Importar firma de la PC** y elige
+   `juego.json` y `firma.jks` de `RMXP-Android-Ports\juegos\<juego>`. Así el APK nuevo se
+   instala **encima** del de la PC sin perder partidas. Si no, se crea una firma nueva a
+   nombre del autor; respáldala con **Exportar firma**.
+6. **Crear e instalar**: arma el APK, lo firma y Android te pregunta si lo instalas. También
+   puedes **Guardar el APK** para pasarlo a otro teléfono.
 
 La app usa los colores de tu fondo de pantalla (Material You, Android 12 o más nuevo).
 
@@ -40,8 +44,8 @@ y la firma. Por eso la app:
 | Parte | Qué hace | Estado |
 |---|---|---|
 | 1 | Interfaz, importar juego (.zip o carpeta), leer datos | Hecha |
-| 2 | Plantilla del APK y armar el APK con el juego | Pendiente |
-| 3 | Firma por juego, instalar, actualizar sin perder partidas | Pendiente |
+| 2 | Plantilla del APK y armar el APK con el juego | Hecha |
+| 3 | Firma por juego (compatible con la PC), instalar, actualizar | Hecha |
 
 ## Para desarrolladores
 
@@ -49,6 +53,8 @@ y la firma. Por eso la app:
 app/src/main/java/com/zenithuzu/rpgmkport/
   MainActivity.java   asistente por pasos
   Juego.java          importar el juego y leer nombre, autor y versión
+  Constructor.java    armar el APK desde la plantilla (ARSCLib) y firmarlo (apksig)
+  Firma.java          firma por juego, mismo formato que la PC (firma.jks + juego.json)
 .github/workflows/apk.yml   compila y publica la versión "ultima"
 ```
 
@@ -58,6 +64,8 @@ propósito para que cada versión nueva se instale encima). Los APK de los juego
 con otra llave, la de cada autor.
 
 ## Créditos
+
+- [ARSCLib](https://github.com/REAndroid/ARSCLib) (Apache-2.0) y [apksig](https://android.googlesource.com/platform/tools/apksig) (Apache-2.0): editar y firmar el APK en el teléfono.
 
 - [RMXP-Android-Ports](https://github.com/ZenithUzu/RMXP-Android-Ports): motor, controles,
   menú y parches que lleva cada juego.

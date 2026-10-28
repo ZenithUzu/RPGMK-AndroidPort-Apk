@@ -34,5 +34,21 @@
     <string name="crear_titulo">Crear la app</string>
     <string name="crear_texto">Se arma el APK con el motor ya listo, se firma a nombre del autor y se instala.</string>
     <string name="crear">Crear e instalar</string>
-    <string name="en_construccion">Esta parte llega en la siguiente actualización.</string>
+    <string name="firma_titulo">Firma</string>
+    <string name="firma_nueva">Se creará una nueva, a nombre de %1$s</string>
+    <string name="firma_guardada">Guardada en el teléfono · %1$s</string>
+    <string name="importar_firma">Importar firma de la PC</string>
+    <string name="importar_firma_sub">Elige juego.json y firma.jks (en la PC: RMXP-Android-Ports\\juegos\\&lt;juego&gt;). Así actualiza el APK que hiciste en la PC.</string>
+    <string name="exportar_firma">Exportar firma</string>
+    <string name="exportar_firma_sub">Para respaldarla o usarla en la PC</string>
+    <string name="firma_mal">Elige los dos archivos: juego.json y firma.jks.</string>
+    <string name="firma_lista">Firma importada · %1$s</string>
+    <string name="firma_exportada">Firma guardada</string>
+    <string name="instalando">Instalando…</string>
+    <string name="instalado">¡Listo! Ya puedes abrir el juego desde tus apps.</string>
+    <string name="conflicto">Ya tienes este juego instalado con otra firma. Importa la firma con la que lo hiciste (la de la PC) y vuelve a crearlo. Si no la tienes, desinstala el juego: tus partidas quedan en la carpeta RPG Maker si la activaste.</string>
+    <string name="fallo_instalar">No se instaló: %1$s</string>
+    <string name="permiso_instalar">Android pide permitir que esta app instale apps. Actívalo, vuelve y presiona Crear otra vez.</string>
+    <string name="guardar_apk">Guardar el APK</string>
+    <string name="apk_guardado">APK guardado</string>
 </resources>

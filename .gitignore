@@ -2,5 +2,7 @@
 build/
 app/build/
 local.properties
+# La descarga CI de RMXP-Android-Ports (plantilla-vN)
+app/src/main/assets/plantilla.apk
 *.iml
 .idea/

@@ -33,5 +33,21 @@
     <string name="crear_titulo">Create the app</string>
     <string name="crear_texto">The APK is put together with the ready-made engine, signed in the author\'s name and installed.</string>
     <string name="crear">Create and install</string>
-    <string name="en_construccion">This part comes in the next update.</string>
+    <string name="firma_titulo">Signature</string>
+    <string name="firma_nueva">A new one will be created in %1$s\'s name</string>
+    <string name="firma_guardada">Saved on the phone · %1$s</string>
+    <string name="importar_firma">Import signature from PC</string>
+    <string name="importar_firma_sub">Pick juego.json and firma.jks (on the PC: RMXP-Android-Ports\\juegos\\&lt;game&gt;). Then it updates the APK you made on the PC.</string>
+    <string name="exportar_firma">Export signature</string>
+    <string name="exportar_firma_sub">To back it up or use it on the PC</string>
+    <string name="firma_mal">Pick both files: juego.json and firma.jks.</string>
+    <string name="firma_lista">Signature imported · %1$s</string>
+    <string name="firma_exportada">Signature saved</string>
+    <string name="instalando">Installing…</string>
+    <string name="instalado">Done! You can open the game from your apps.</string>
+    <string name="conflicto">This game is already installed with a different signature. Import the signature you made it with (the PC one) and create it again. If you don\'t have it, uninstall the game: your saves stay in the RPG Maker folder if you turned it on.</string>
+    <string name="fallo_instalar">Not installed: %1$s</string>
+    <string name="permiso_instalar">Android asks you to allow this app to install apps. Turn it on, come back and tap Create again.</string>
+    <string name="guardar_apk">Save the APK</string>
+    <string name="apk_guardado">APK saved</string>
 </resources>

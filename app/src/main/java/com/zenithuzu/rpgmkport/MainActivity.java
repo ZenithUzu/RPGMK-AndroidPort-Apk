@@ -47,8 +47,10 @@ public class MainActivity extends AppCompatActivity
     private MaterialButton mSiguiente;
     private final Handler mUi = new Handler(Looper.getMainLooper());
 
-    private ActivityResultLauncher<String[]> mElegirZip, mElegirIcono;
-    private ActivityResultLauncher<Uri> mElegirCarpeta;
+    private ActivityResultLauncher<String[]> mElegirZip, mElegirIcono, mImportarFirma;
+    private ActivityResultLauncher<Uri> mElegirCarpeta, mExportarFirma;
+    private ActivityResultLauncher<String> mGuardarApk;
+    private File mApk;              // el último APK creado
 
     @Override
     protected void onCreate(Bundle state)
@@ -73,6 +75,16 @@ public class MainActivity extends AppCompatActivity
                 mIcono = uri;
                 mostrar(mPaso);
             }
+        });
+
+        mImportarFirma = registerForActivityResult(new ActivityResultContracts.OpenMultipleDocuments(), uris -> {
+            if (uris != null && !uris.isEmpty()) importarFirma(uris);
+        });
+        mExportarFirma = registerForActivityResult(new ActivityResultContracts.OpenDocumentTree(), uri -> {
+            if (uri != null) exportarFirma(uri);
+        });
+        mGuardarApk = registerForActivityResult(new ActivityResultContracts.CreateDocument("application/vnd.android.package-archive"), uri -> {
+            if (uri != null) guardarApk(uri);
         });
 
         findViewById(R.id.atras).setOnClickListener(v -> atras());
@@ -120,6 +132,11 @@ public class MainActivity extends AppCompatActivity
 
     private void siguiente()
     {
+        if (mPaso == 3) {
+            if (!mOcupado)
+                crear();
+            return;
+        }
         if (mPaso == 2)
             guardarDatos();
         if (mPaso < PASOS)
@@ -128,6 +145,7 @@ public class MainActivity extends AppCompatActivity
 
     private void mostrar(int paso)
     {
+        mEstadoFirma = null;
         if (mPaso == 2 && paso != 2)
             guardarDatos();
         mPaso = paso;
@@ -303,7 +321,110 @@ public class MainActivity extends AppCompatActivity
 
         // El contenido va dentro del encabezado anterior para que todo se desplace junto
         mContenido.removeView(v);
-        ((LinearLayout) mContenido.getChildAt(0)).addView(v);
+        LinearLayout box = (LinearLayout) mContenido.getChildAt(0);
+        box.addView(v);
+
+        // Firma: la del teléfono, una importada de la PC, o una nueva
+        TextView t = new TextView(this, null, 0, R.style.Rpg_Titulo);
+        t.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_TitleLarge);
+        t.setText(R.string.firma_titulo);
+        t.setPadding(0, dp(28), 0, 0);
+        box.addView(t);
+        mEstadoFirma = new TextView(this, null, 0, R.style.Rpg_Cuerpo);
+        mEstadoFirma.setPadding(0, dp(6), 0, 0);
+        box.addView(mEstadoFirma);
+        mostrarFirma();
+        opcion(box, R.drawable.ic_carpeta, getString(R.string.importar_firma), getString(R.string.importar_firma_sub),
+            x -> mImportarFirma.launch(new String[] { "*/*" }));
+        opcion(box, R.drawable.ic_zip, getString(R.string.exportar_firma), getString(R.string.exportar_firma_sub),
+            x -> { if (firmaGuardada() != null) mExportarFirma.launch(null); });
+    }
+
+    private TextView mEstadoFirma;
+
+    /** Carpeta de la firma: igual que en la PC, juegos/<nombre del juego>. */
+    private File carpetaFirma()
+    {
+        return new File(getFilesDir(), "firmas/" + Juego.slug(mInfo.titulo, "juego"));
+    }
+
+    private Firma firmaGuardada()
+    {
+        try {
+            return Firma.cargar(carpetaFirma());
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private void mostrarFirma()
+    {
+        if (mEstadoFirma == null)
+            return;
+        Firma f = firmaGuardada();
+        mEstadoFirma.setText(f != null ? getString(R.string.firma_guardada, f.id)
+            : getString(R.string.firma_nueva, mInfo.autor.isEmpty() ? "?" : mInfo.autor));
+    }
+
+    private void importarFirma(java.util.List<Uri> uris)
+    {
+        guardarDatos();
+        File tmp = new File(getCacheDir(), "firma-importada");
+        Juego.borrar(tmp);
+        tmp.mkdirs();
+        try {
+            for (Uri u : uris) {
+                String n = nombreDe(u);
+                if (n == null || !(n.equalsIgnoreCase("juego.json") || n.toLowerCase().endsWith(".jks")))
+                    continue;
+                try (java.io.InputStream in = getContentResolver().openInputStream(u);
+                     java.io.OutputStream out = new java.io.FileOutputStream(new File(tmp, n.toLowerCase().endsWith(".jks") ? "firma.jks" : "juego.json"))) {
+                    Juego.copiar(in, out);
+                }
+            }
+            Firma f = Firma.cargar(tmp); // comprueba que la contraseña abre la llave
+            if (f == null)
+                throw new IllegalArgumentException(getString(R.string.firma_mal));
+            Firma.copiarCarpeta(tmp, carpetaFirma());
+            if (!f.autor.isEmpty() && mInfo.autor.isEmpty())
+                mInfo.autor = f.autor;
+            aviso(getString(R.string.firma_lista, f.id));
+            mostrar(2);
+        } catch (Exception e) {
+            aviso(e instanceof IllegalArgumentException ? e.getMessage() : getString(R.string.error, e.getMessage()));
+        }
+    }
+
+    private void exportarFirma(Uri arbol)
+    {
+        try {
+            androidx.documentfile.provider.DocumentFile dir = androidx.documentfile.provider.DocumentFile.fromTreeUri(this, arbol);
+            androidx.documentfile.provider.DocumentFile sub = dir.createDirectory(Juego.slug(mInfo.titulo, "juego"));
+            for (String n : new String[] { "juego.json", "firma.jks" }) {
+                androidx.documentfile.provider.DocumentFile d = sub.createFile("application/octet-stream", n);
+                try (java.io.InputStream in = new java.io.FileInputStream(new File(carpetaFirma(), n));
+                     java.io.OutputStream out = getContentResolver().openOutputStream(d.getUri())) {
+                    Juego.copiar(in, out);
+                }
+            }
+            aviso(getString(R.string.firma_exportada));
+        } catch (Exception e) {
+            aviso(getString(R.string.error, e.getMessage()));
+        }
+    }
+
+    private String nombreDe(Uri u)
+    {
+        try (android.database.Cursor c = getContentResolver().query(u, new String[] { android.provider.OpenableColumns.DISPLAY_NAME }, null, null, null)) {
+            if (c != null && c.moveToFirst())
+                return c.getString(0);
+        }
+        return u.getLastPathSegment();
+    }
+
+    private void aviso(String texto)
+    {
+        com.google.android.material.snackbar.Snackbar.make(findViewById(R.id.raiz), texto, com.google.android.material.snackbar.Snackbar.LENGTH_LONG).show();
     }
 
     private void guardarDatos()
@@ -320,15 +441,155 @@ public class MainActivity extends AppCompatActivity
 
     // ------------------------------------------------------------------ paso 3: crear
 
+    private TextView mProgreso;
+
     private void pasoCrear()
     {
         LinearLayout box = encabezado(R.string.crear_titulo, R.string.crear_texto);
-        TextView aviso = new TextView(this, null, 0, R.style.Rpg_Cuerpo);
-        aviso.setText(getString(R.string.juego_listo, mInfo.titulo, mInfo.version) + "\n" + mInfo.autor);
-        box.addView(aviso);
+        TextView resumen = new TextView(this, null, 0, R.style.Rpg_Cuerpo);
+        resumen.setText(getString(R.string.juego_listo, mInfo.titulo, mInfo.version) + "\n" + mInfo.autor);
+        box.addView(resumen);
+        LinearProgressIndicator barra = new LinearProgressIndicator(this);
+        barra.setIndeterminate(true);
+        barra.setVisibility(mOcupado ? View.VISIBLE : View.GONE);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.topMargin = dp(24);
+        box.addView(barra, lp);
+        mProgreso = new TextView(this, null, 0, R.style.Rpg_Cuerpo);
+        mProgreso.setPadding(0, dp(12), 0, 0);
+        box.addView(mProgreso);
+        if (mApk != null && mApk.isFile() && !mOcupado)
+            opcion(box, R.drawable.ic_zip, getString(R.string.guardar_apk), mApk.getName(),
+                x -> mGuardarApk.launch(mApk.getName()));
         mSiguiente.setText(R.string.crear);
-        mSiguiente.setEnabled(false);
-        mAyuda.setText(R.string.en_construccion);
-        mAyuda.setVisibility(View.VISIBLE);
+        mSiguiente.setEnabled(!mOcupado);
+    }
+
+    /** Arma el APK con la plantilla, lo firma e inicia la instalación. */
+    private void crear()
+    {
+        if (!getPackageManager().canRequestPackageInstalls()) {
+            aviso(getString(R.string.permiso_instalar));
+            startActivity(new android.content.Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                Uri.parse("package:" + getPackageName())));
+            return;
+        }
+        mOcupado = true;
+        mostrar(3);
+        new Thread(() -> {
+            String fallo = null;
+            File apk = new File(getCacheDir(), Juego.slug(mInfo.titulo, "juego") + ".apk");
+            try {
+                File plantilla = plantilla();
+                Firma firma = firmaGuardada();
+                if (firma == null)
+                    firma = Firma.crear(carpetaFirma(), "com." + Juego.slug(mInfo.autor, "fangame") + "."
+                        + Juego.slug(mInfo.titulo, "juego"), mInfo.autor, mInfo.titulo);
+                Constructor.Datos d = new Constructor.Datos();
+                d.titulo = mInfo.titulo;
+                d.version = mInfo.version.isEmpty() ? "1.0" : mInfo.version;
+                d.versionCode = Constructor.versionCodeAhora();
+                d.ahorrar = mAhorrar;
+                for (String abi : android.os.Build.SUPPORTED_ABIS)
+                    if (abi.equals("arm64-v8a") || abi.equals("armeabi-v7a")) {
+                        d.abis.add(abi); // solo el motor de este teléfono
+                        break;
+                    }
+                if (mIcono != null)
+                    try (java.io.InputStream in = getContentResolver().openInputStream(mIcono)) {
+                        java.io.ByteArrayOutputStream b = new java.io.ByteArrayOutputStream();
+                        Juego.copiar(in, b);
+                        d.iconoPng = b.toByteArray();
+                    }
+                Constructor.construir(plantilla, mJuego, d, firma, apk,
+                    t -> mUi.post(() -> { if (mProgreso != null) mProgreso.setText(t); }));
+                mApk = apk;
+            } catch (Exception e) {
+                fallo = getString(R.string.error, String.valueOf(e.getMessage()));
+            }
+            String error = fallo;
+            mUi.post(() -> {
+                mOcupado = false;
+                mostrar(3);
+                if (error != null)
+                    mProgreso.setText(error);
+                else
+                    instalar(apk);
+            });
+        }).start();
+    }
+
+    /** La plantilla viene dentro de esta app; se copia afuera una vez para poder leerla. */
+    private File plantilla() throws java.io.IOException
+    {
+        File f = new File(getFilesDir(), "plantilla.apk");
+        long tam = getAssets().openFd("plantilla.apk").getLength();
+        if (!f.isFile() || f.length() != tam)
+            try (java.io.InputStream in = getAssets().open("plantilla.apk");
+                 java.io.OutputStream out = new java.io.FileOutputStream(f)) {
+                Juego.copiar(in, out);
+            }
+        return f;
+    }
+
+    private void instalar(File apk)
+    {
+        mProgreso.setText(R.string.instalando);
+        try {
+            android.content.pm.PackageInstaller pi = getPackageManager().getPackageInstaller();
+            android.content.pm.PackageInstaller.SessionParams params = new android.content.pm.PackageInstaller.SessionParams(
+                android.content.pm.PackageInstaller.SessionParams.MODE_FULL_INSTALL);
+            int id = pi.createSession(params);
+            try (android.content.pm.PackageInstaller.Session s = pi.openSession(id)) {
+                try (java.io.InputStream in = new java.io.FileInputStream(apk);
+                     java.io.OutputStream out = s.openWrite("juego.apk", 0, apk.length())) {
+                    Juego.copiar(in, out);
+                    s.fsync(out);
+                }
+                android.content.Intent i = new android.content.Intent(this, MainActivity.class).setAction("rpgmk.instalado");
+                android.app.PendingIntent p = android.app.PendingIntent.getActivity(this, 0, i,
+                    android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_MUTABLE);
+                s.commit(p.getIntentSender());
+            }
+        } catch (Exception e) {
+            mProgreso.setText(getString(R.string.fallo_instalar, e.getMessage()));
+        }
+    }
+
+    /** Respuesta del instalador de Android. */
+    @Override
+    protected void onNewIntent(android.content.Intent intent)
+    {
+        super.onNewIntent(intent);
+        if (!"rpgmk.instalado".equals(intent.getAction()))
+            return;
+        int estado = intent.getIntExtra(android.content.pm.PackageInstaller.EXTRA_STATUS, -999);
+        if (estado == android.content.pm.PackageInstaller.STATUS_PENDING_USER_ACTION) {
+            android.content.Intent confirmar = intent.getParcelableExtra(android.content.Intent.EXTRA_INTENT);
+            if (confirmar != null)
+                startActivity(confirmar); // el aviso de Android: "¿Quieres instalar…?"
+            return;
+        }
+        String texto;
+        if (estado == android.content.pm.PackageInstaller.STATUS_SUCCESS)
+            texto = getString(R.string.instalado);
+        else if (estado == android.content.pm.PackageInstaller.STATUS_FAILURE_CONFLICT)
+            texto = getString(R.string.conflicto);
+        else
+            texto = getString(R.string.fallo_instalar, String.valueOf(intent.getStringExtra(android.content.pm.PackageInstaller.EXTRA_STATUS_MESSAGE)));
+        if (mPaso != 3)
+            mostrar(3);
+        mProgreso.setText(texto);
+    }
+
+    private void guardarApk(Uri uri)
+    {
+        try (java.io.InputStream in = new java.io.FileInputStream(mApk);
+             java.io.OutputStream out = getContentResolver().openOutputStream(uri)) {
+            Juego.copiar(in, out);
+            aviso(getString(R.string.apk_guardado));
+        } catch (Exception e) {
+            aviso(getString(R.string.error, e.getMessage()));
+        }
     }
 }
