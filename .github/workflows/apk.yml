@@ -17,7 +17,6 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - uses: android-actions/setup-android@v3
       - name: Compilar
         run: ./gradlew --no-daemon assembleRelease
       - name: Publicar
