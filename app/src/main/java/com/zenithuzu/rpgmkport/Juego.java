@@ -3,7 +3,8 @@ package com.zenithuzu.rpgmkport;
 import android.content.Context;
 import android.net.Uri;
 
-import androidx.documentfile.provider.DocumentFile;
+import android.database.Cursor;
+import android.provider.DocumentsContract;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,7 +19,12 @@ import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Deque;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -35,134 +41,177 @@ public final class Juego
     public static class Info
     {
         public String titulo = "", autor = "", version = "";
+        public int archivos;
+        public List<String> avisos = new ArrayList<>();
+    }
+
+    /** Cosas de Windows que pueden fallar en Android (revisión rápida, no exacta). */
+    static List<String> revisar(Origen o)
+    {
+        List<String> avisos = new ArrayList<>();
+        int dll = 0, video = 0;
+        for (String r : o.archivos()) {
+            String b = r.toLowerCase(Locale.ROOT);
+            if (b.endsWith(".dll") && !b.startsWith("rgss") && !b.contains("/rgss")) dll++;
+            if (b.endsWith(".wmv") || b.endsWith(".avi") || b.endsWith(".mpg")) video++;
+        }
+        if (dll > 0) avisos.add(dll + " .dll de Windows: lo que hagan no funcionará en Android");
+        if (video > 0) avisos.add(video + " videos .wmv/.avi/.mpg: pásalos a .ogv para que se vean");
+        for (String r : o.archivos())
+            if (r.matches("(?i)Data/Scripts\\.(rxdata|rvdata2?)")) {
+                String t = scripts(o, r);
+                if (t.contains("Win32API")) avisos.add("Usa Win32API (funciones de Windows): se reemplazan las comunes, alguna puede fallar");
+                if (t.contains("Kernel32") || t.contains("kernel32")) avisos.add("Llama a kernel32: puede fallar");
+            }
+        return avisos;
+    }
+
+    /** Texto de los scripts: cada script viene comprimido con zlib dentro del archivo. */
+    private static String scripts(Origen o, String rel)
+    {
+        StringBuilder sb = new StringBuilder();
+        try (InputStream in = o.abrir(rel)) {
+            java.io.ByteArrayOutputStream b = new java.io.ByteArrayOutputStream();
+            copiar(in, b);
+            byte[] d = b.toByteArray();
+            byte[] buf = new byte[65536];
+            for (int i = 0; i + 1 < d.length; i++) {
+                if ((d[i] & 0xFF) != 0x78 || (d[i + 1] & 0xFF) != 0x9C)
+                    continue;
+                java.util.zip.Inflater inf = new java.util.zip.Inflater();
+                inf.setInput(d, i, d.length - i);
+                try {
+                    int n;
+                    while ((n = inf.inflate(buf)) > 0)
+                        sb.append(new String(buf, 0, n, StandardCharsets.ISO_8859_1));
+                    i += (int) inf.getBytesRead() - 1;
+                } catch (java.util.zip.DataFormatException ignored) {
+                } finally {
+                    inf.end();
+                }
+            }
+        } catch (IOException ignored) {
+        }
+        return sb.toString();
     }
 
     public interface Progreso { void archivos(int n); }
 
     private Juego() {}
 
-    static File carpetaJuegos(Context c) { return new File(c.getFilesDir(), "juegos"); }
-
-    // ------------------------------------------------------------------ importar
-
-    /** Descomprime el .zip y devuelve la carpeta del juego (la que tiene Game.ini). */
-    public static File importarZip(Context c, Uri zip, Progreso p) throws IOException
-    {
-        File tmp = nuevaTemporal(c);
-        try {
-            descomprimir(c, zip, tmp, StandardCharsets.UTF_8, p);
-        } catch (IllegalArgumentException | java.util.zip.ZipException e) {
-            // Zips hechos en Windows guardan los nombres con la codificación vieja (CP437)
-            borrar(tmp);
-            tmp.mkdirs();
-            descomprimir(c, zip, tmp, Charset.forName("Cp437"), p);
-        }
-        return finalizar(c, tmp);
-    }
-
-    /** Copia una carpeta elegida con el selector de Android. */
-    public static File importarCarpeta(Context c, Uri arbol, Progreso p) throws IOException
-    {
-        File tmp = nuevaTemporal(c);
-        DocumentFile raiz = DocumentFile.fromTreeUri(c, arbol);
-        if (raiz == null)
-            throw new IOException("carpeta no válida");
-        int[] n = { 0 };
-        copiarArbol(c, raiz, new File(tmp, nombreSeguro(raiz.getName(), "juego")), p, n);
-        return finalizar(c, tmp);
-    }
-
-    private static File nuevaTemporal(Context c)
-    {
-        File tmp = new File(carpetaJuegos(c), ".nuevo");
-        borrar(tmp);
-        tmp.mkdirs();
-        return tmp;
-    }
-
-    private static void descomprimir(Context c, Uri zip, File destino, Charset cs, Progreso p) throws IOException
-    {
-        String base = destino.getCanonicalPath() + File.separator;
-        int n = 0;
-        try (InputStream in = c.getContentResolver().openInputStream(zip);
-             ZipInputStream z = new ZipInputStream(in, cs)) {
-            ZipEntry e;
-            while ((e = z.getNextEntry()) != null) {
-                File f = new File(destino, e.getName());
-                if (!f.getCanonicalPath().startsWith(base)) // nada fuera de la carpeta
-                    continue;
-                if (e.isDirectory()) {
-                    f.mkdirs();
-                    continue;
-                }
-                f.getParentFile().mkdirs();
-                try (OutputStream out = new FileOutputStream(f)) {
-                    copiar(z, out);
-                }
-                if (++n % 25 == 0)
-                    p.archivos(n);
-            }
-        }
-        p.archivos(n);
-    }
-
-    private static void copiarArbol(Context c, DocumentFile src, File dst, Progreso p, int[] n) throws IOException
-    {
-        dst.mkdirs();
-        for (DocumentFile d : src.listFiles()) {
-            File f = new File(dst, nombreSeguro(d.getName(), "x"));
-            if (d.isDirectory()) {
-                copiarArbol(c, d, f, p, n);
-            } else {
-                try (InputStream in = c.getContentResolver().openInputStream(d.getUri());
-                     OutputStream out = new FileOutputStream(f)) {
-                    copiar(in, out);
-                }
-                if (++n[0] % 25 == 0)
-                    p.archivos(n[0]);
-            }
-        }
-        p.archivos(n[0]);
-    }
-
-    /** Busca Game.ini, lo mueve a juegos/<nombre> y borra lo temporal. */
-    private static File finalizar(Context c, File tmp) throws IOException
-    {
-        File raiz = buscarRaiz(tmp);
-        if (raiz == null) {
-            borrar(tmp);
-            throw new SinGameIni();
-        }
-        File destino = new File(carpetaJuegos(c), slug(leer(raiz).titulo, "juego"));
-        borrar(destino);
-        if (!raiz.renameTo(destino))
-            throw new IOException("no se pudo mover el juego");
-        borrar(tmp);
-        return destino;
-    }
-
     public static class SinGameIni extends IOException {}
 
-    /** La carpeta (hasta 3 niveles adentro) que tiene Game.ini. */
-    static File buscarRaiz(File dir)
+    // ------------------------------------------------------------------ abrir (sin copiar)
+
+    /** El .zip tal cual: se lee directo, sin descomprimirlo (mucho más rápido y sin ocupar espacio). */
+    public static Origen abrirZip(Context c, Uri zip) throws IOException
     {
-        Deque<File[]> cola = new ArrayDeque<>();
-        cola.add(new File[] { dir, new File("0") });
-        while (!cola.isEmpty()) {
-            File[] item = cola.poll();
-            int nivel = Integer.parseInt(item[1].getName());
-            File[] hijos = item[0].listFiles();
-            if (hijos == null)
-                continue;
-            for (File h : hijos)
-                if (h.isFile() && h.getName().equalsIgnoreCase("Game.ini"))
-                    return item[0];
-            if (nivel < 3)
-                for (File h : hijos)
-                    if (h.isDirectory())
-                        cola.add(new File[] { h, new File(String.valueOf(nivel + 1)) });
+        android.os.ParcelFileDescriptor pfd = c.getContentResolver().openFileDescriptor(zip, "r");
+        if (pfd == null)
+            throw new IOException("no se pudo abrir el .zip");
+        ABIERTOS.add(pfd); // debe seguir abierto mientras se usa
+        return new Origen.Zip("/proc/self/fd/" + pfd.getFd(), nombreDe(c, zip));
+    }
+
+    private static final List<Object> ABIERTOS = new ArrayList<>();
+
+    /** Una carpeta elegida con el selector: se lista de una vez por carpeta (rápido). */
+    public static Origen abrirCarpeta(Context c, Uri arbol, Progreso p) throws IOException
+    {
+        Arbol a = new Arbol(c, arbol, p);
+        if (a.buscar("Game.ini") == null)
+            throw new SinGameIni();
+        return a;
+    }
+
+    /** Carpeta vía el selector de Android: nombre e id de todos los archivos en una consulta por carpeta. */
+    static class Arbol extends Origen
+    {
+        private final Context c;
+        private final Uri arbol;
+        private final Map<String, String> ids = new LinkedHashMap<>(); // ruta relativa -> id del documento
+        private final String nombre;
+
+        Arbol(Context c, Uri arbol, Progreso p) throws IOException
+        {
+            this.c = c;
+            this.arbol = arbol;
+            String raiz = DocumentsContract.getTreeDocumentId(arbol);
+            // La carpeta con Game.ini puede estar hasta 3 niveles abajo de la elegida
+            String[] base = buscarRaiz(raiz, 0);
+            if (base == null)
+                throw new SinGameIni();
+            nombre = base[1];
+            listar(base[0], "", p);
+            p.archivos(ids.size());
         }
-        return null;
+
+        private Cursor hijos(String id)
+        {
+            return c.getContentResolver().query(DocumentsContract.buildChildDocumentsUriUsingTree(arbol, id),
+                new String[] { DocumentsContract.Document.COLUMN_DOCUMENT_ID, DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+                    DocumentsContract.Document.COLUMN_MIME_TYPE }, null, null, null);
+        }
+
+        private String[] buscarRaiz(String id, int nivel)
+        {
+            List<String[]> dirs = new ArrayList<>();
+            try (Cursor cur = hijos(id)) {
+                while (cur != null && cur.moveToNext()) {
+                    if (cur.getString(1).equalsIgnoreCase("Game.ini"))
+                        return new String[] { id, nombreDoc(id) };
+                    if (DocumentsContract.Document.MIME_TYPE_DIR.equals(cur.getString(2)))
+                        dirs.add(new String[] { cur.getString(0) });
+                }
+            }
+            if (nivel < 3)
+                for (String[] d : dirs) {
+                    String[] r = buscarRaiz(d[0], nivel + 1);
+                    if (r != null)
+                        return r;
+                }
+            return null;
+        }
+
+        private String nombreDoc(String id)
+        {
+            try (Cursor cur = c.getContentResolver().query(DocumentsContract.buildDocumentUriUsingTree(arbol, id),
+                    new String[] { DocumentsContract.Document.COLUMN_DISPLAY_NAME }, null, null, null)) {
+                return cur != null && cur.moveToFirst() ? cur.getString(0) : "juego";
+            }
+        }
+
+        private void listar(String id, String rel, Progreso p)
+        {
+            try (Cursor cur = hijos(id)) {
+                while (cur != null && cur.moveToNext()) {
+                    String n = cur.getString(1);
+                    if (DocumentsContract.Document.MIME_TYPE_DIR.equals(cur.getString(2)))
+                        listar(cur.getString(0), rel + n + "/", p);
+                    else if (ids.put(rel + n, cur.getString(0)) == null && ids.size() % 200 == 0)
+                        p.archivos(ids.size());
+                }
+            }
+        }
+
+        @Override public String nombre() { return nombre; }
+        @Override public List<String> archivos() { return new ArrayList<>(ids.keySet()); }
+        @Override public InputStream abrir(String rel) throws IOException
+        {
+            InputStream in = c.getContentResolver().openInputStream(DocumentsContract.buildDocumentUriUsingTree(arbol, ids.get(rel)));
+            if (in == null)
+                throw new IOException(rel);
+            return in;
+        }
+    }
+
+    static String nombreDe(Context c, Uri u)
+    {
+        try (Cursor cur = c.getContentResolver().query(u, new String[] { android.provider.OpenableColumns.DISPLAY_NAME }, null, null, null)) {
+            if (cur != null && cur.moveToFirst())
+                return cur.getString(0).replaceAll("(?i)\\.zip$", "");
+        }
+        return "juego";
     }
 
     // ------------------------------------------------------------------ leer datos
@@ -181,22 +230,20 @@ public final class Juego
     };
     private static final Pattern VERSION = Pattern.compile("\\b(?:v|ver\\.?|versi[oó]n|version)\\s*([0-9]+(?:\\.[0-9]+){0,3})", Pattern.CASE_INSENSITIVE);
 
-    public static Info leer(File raiz)
+    public static Info leer(Origen o)
     {
         Info info = new Info();
-        info.titulo = raiz.getName();
-        File[] hijos = raiz.listFiles();
-        if (hijos == null)
-            hijos = new File[0];
-        Arrays.sort(hijos);
-        for (File f : hijos)
-            if (f.getName().equalsIgnoreCase("Game.ini")) {
-                Matcher m = Pattern.compile("^\\s*Title\\s*=\\s*(.+?)\\s*$", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE).matcher(leerTexto(f));
-                if (m.find())
-                    info.titulo = m.group(1);
-            }
-        for (File f : textos(hijos)) {
-            for (String linea : leerTexto(f).split("\\r?\\n")) {
+        info.titulo = o.nombre();
+        info.archivos = o.archivos().size();
+        info.avisos = revisar(o);
+        String ini = o.buscar("Game.ini");
+        if (ini != null) {
+            Matcher m = Pattern.compile("^\\s*Title\\s*=\\s*(.+?)\\s*$", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE).matcher(leerTexto(o, ini));
+            if (m.find())
+                info.titulo = m.group(1);
+        }
+        for (String f : textos(o)) {
+            for (String linea : leerTexto(o, f).split("\\r?\\n")) {
                 linea = linea.trim();
                 if (MOTOR.matcher(linea).find())
                     continue;
@@ -226,35 +273,36 @@ public final class Juego
     }
 
     /** Léeme, créditos, cambios... en la carpeta del juego y un nivel más adentro (ej. Docs/). */
-    private static java.util.List<File> textos(File[] hijos)
+    static List<String> textos(Origen o)
     {
-        java.util.List<File> l = new java.util.ArrayList<>();
-        for (File f : hijos)
-            if (f.isFile() && LEEME.matcher(f.getName()).find())
-                l.add(f);
-        for (File d : hijos) {
-            if (!d.isDirectory() || CARPETAS_JUEGO.contains(d.getName().toLowerCase(Locale.ROOT)))
+        List<String> arriba = new ArrayList<>(), dentro = new ArrayList<>();
+        for (String r : o.archivos()) {
+            String[] p = r.split("/");
+            String nombre = p[p.length - 1];
+            if (!LEEME.matcher(nombre).find())
                 continue;
-            File[] dentro = d.listFiles();
-            if (dentro == null)
-                continue;
-            Arrays.sort(dentro);
-            for (File f : dentro)
-                if (f.isFile() && LEEME.matcher(f.getName()).find())
-                    l.add(f);
+            if (p.length == 1)
+                arriba.add(r);
+            else if (p.length == 2 && !CARPETAS_JUEGO.contains(p[0].toLowerCase(Locale.ROOT)))
+                dentro.add(r);
         }
-        return l;
+        Collections.sort(arriba);
+        Collections.sort(dentro);
+        arriba.addAll(dentro);
+        return arriba;
     }
 
     /** Lee un texto en UTF-8 o, si no lo es, en la codificación de Windows. Quita formato RTF. */
-    static String leerTexto(File f)
+    static String leerTexto(Origen o, String rel)
     {
         byte[] raw;
-        try (InputStream in = new FileInputStream(f)) {
-            raw = new byte[(int) Math.min(f.length(), 200000)];
-            int n = 0, r;
-            while (n < raw.length && (r = in.read(raw, n, raw.length - n)) > 0)
-                n += r;
+        try (InputStream in = o.abrir(rel)) {
+            java.io.ByteArrayOutputStream b = new java.io.ByteArrayOutputStream();
+            byte[] buf = new byte[8192];
+            int r;
+            while (b.size() < 200000 && (r = in.read(buf)) > 0)
+                b.write(buf, 0, r);
+            raw = b.toByteArray();
         } catch (IOException e) {
             return "";
         }

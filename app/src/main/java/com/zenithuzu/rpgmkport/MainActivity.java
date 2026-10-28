@@ -35,7 +35,9 @@ public class MainActivity extends AppCompatActivity
     private static final int PASOS = 3;
 
     private int mPaso;
-    private File mJuego;            // carpeta del juego importado (la que tiene Game.ini)
+    private Origen mJuego;          // el juego (carpeta o .zip), leído sin copiarlo
+    private Uri mJuegoUri;
+    private boolean mJuegoZip;
     private Juego.Info mInfo;
     private Uri mIcono;
     private boolean mAhorrar, mOcupado;
@@ -106,12 +108,15 @@ public class MainActivity extends AppCompatActivity
         if (state != null) {
             mPaso = state.getInt("paso");
             String j = state.getString("juego");
-            if (j != null && new File(j).isDirectory()) {
-                mJuego = new File(j);
-                mInfo = Juego.leer(mJuego);
+            if (j != null) {
+                mostrar(mPaso);
+                importar(Uri.parse(j), state.getBoolean("zip"));
+                return;
             }
         }
         mostrar(mPaso);
+        Novedades.revisar(this);
+        new Thread(() -> Juego.borrar(new File(getFilesDir(), "juegos"))).start(); // copias de versiones viejas
     }
 
     @Override
@@ -119,8 +124,10 @@ public class MainActivity extends AppCompatActivity
     {
         super.onSaveInstanceState(out);
         out.putInt("paso", mPaso);
-        if (mJuego != null)
-            out.putString("juego", mJuego.getPath());
+        if (mJuegoUri != null) {
+            out.putString("juego", mJuegoUri.toString());
+            out.putBoolean("zip", mJuegoZip);
+        }
     }
 
     // ------------------------------------------------------------------ navegación
@@ -293,7 +300,9 @@ public class MainActivity extends AppCompatActivity
         mEstado.setPadding(0, dp(12), 0, 0);
         box.addView(mEstado);
         if (mJuego != null && mInfo != null)
-            mEstado.setText(getString(R.string.juego_listo, mInfo.titulo, mInfo.version));
+            mEstado.setText(getString(R.string.juego_listo, mInfo.titulo, mInfo.version)
+                + "\n" + getString(R.string.archivos, mInfo.archivos)
+                + (mInfo.avisos.isEmpty() ? "\n✓ " + getString(R.string.compatible) : "\n⚠ " + String.join("\n⚠ ", mInfo.avisos)));
 
         mSiguiente.setEnabled(mJuego != null && !mOcupado);
         if (mJuego == null) {
@@ -308,22 +317,28 @@ public class MainActivity extends AppCompatActivity
         mostrar(1);
         new Thread(() -> {
             String error = null;
-            File juego = null;
+            Origen juego = null;
+            Juego.Info info = null;
             try {
                 Juego.Progreso p = n -> mUi.post(() -> { if (mEstado != null) mEstado.setText(getString(R.string.copiando, n)); });
-                juego = zip ? Juego.importarZip(this, uri, p) : Juego.importarCarpeta(this, uri, p);
+                juego = zip ? Juego.abrirZip(this, uri) : Juego.abrirCarpeta(this, uri, p);
+                mUi.post(() -> { if (mEstado != null) mEstado.setText(R.string.revisando); });
+                info = Juego.leer(juego);
             } catch (Juego.SinGameIni e) {
                 error = getString(R.string.sin_game_ini);
             } catch (Exception e) {
                 error = getString(R.string.error, e.getMessage());
             }
-            File listo = juego;
+            Origen listo = juego;
+            Juego.Info leido = info;
             String fallo = error;
             mUi.post(() -> {
                 mOcupado = false;
-                if (listo != null) {
+                if (listo != null && leido != null) {
                     mJuego = listo;
-                    mInfo = Juego.leer(listo);
+                    mJuegoUri = uri;
+                    mJuegoZip = zip;
+                    mInfo = leido;
                     mIcono = null;
                 }
                 mostrar(1);

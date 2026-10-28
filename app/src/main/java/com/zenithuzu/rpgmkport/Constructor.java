@@ -52,7 +52,7 @@ public final class Constructor
     /** Versión que siempre crece: minutos desde 2020 (igual que en la PC). */
     public static long versionCodeAhora() { return (System.currentTimeMillis() / 1000 - 1577836800L) / 60; }
 
-    public static void construir(File plantilla, File juego, Datos d, Firma firma, File salida, Progreso p) throws Exception
+    public static void construir(File plantilla, Origen juego, Datos d, Firma firma, File salida, Progreso p) throws Exception
     {
         p.paso("Leyendo la plantilla…");
         ApkModule apk = ApkModule.loadApkFile(plantilla);
@@ -111,7 +111,7 @@ public final class Constructor
         // El juego
         p.paso("Agregando el juego…");
         List<String> ligero = new ArrayList<>();
-        agregar(apk, juego, "", ligero, d.ahorrar);
+        agregar(apk, juego, ligero, d.ahorrar);
         apk.add(new ByteInputSource(mkxpJson(juego, d.titulo, parches).getBytes(StandardCharsets.US_ASCII), "assets/game/mkxp.json"));
         if (d.ahorrar) {
             Collections.sort(ligero);
@@ -120,7 +120,15 @@ public final class Constructor
 
         p.paso("Escribiendo el APK…");
         File sinFirma = new File(salida.getPath() + ".sinfirma");
-        apk.writeApk(sinFirma);
+        java.util.Set<String> delJuego = new java.util.HashSet<>();
+        for (String r : juego.archivos())
+            delJuego.add("assets/game/" + r);
+        int total = delJuego.size();
+        int[] n = { 0 };
+        apk.writeApk(sinFirma, (nombre, metodo, largo) -> {
+            if (delJuego.contains(nombre) && ++n[0] % 100 == 0)
+                p.paso("Escribiendo el APK… " + n[0] + " de " + total + " archivos");
+        });
         apk.close();
 
         p.paso("Firmando a nombre de " + firma.autor + "…");
@@ -129,7 +137,8 @@ public final class Constructor
         new ApkSigner.Builder(Collections.singletonList(sc))
             .setInputApk(sinFirma)
             .setOutputApk(salida)
-            .setV1SigningEnabled(true)
+            .setV1SigningEnabled(false) // con v2 basta (Android 7+): se firma una sola vez
+            .setMinSdkVersion(24)
             .setV2SigningEnabled(true)
             .setV3SigningEnabled(false)
             .build()
@@ -145,26 +154,22 @@ public final class Constructor
             a.setValueAsString(nombre);
     }
 
-    private static void agregar(ApkModule apk, File dir, String rel, List<String> ligero, boolean ahorrar)
+    private static void agregar(ApkModule apk, Origen o, List<String> ligero, boolean ahorrar)
     {
-        File[] hijos = dir.listFiles();
-        if (hijos == null)
-            return;
-        for (File f : hijos) {
-            String r = rel + f.getName();
-            if (f.isDirectory()) {
-                agregar(apk, f, r + "/", ligero, ahorrar);
+        for (String r : o.archivos()) {
+            String bajo = r.toLowerCase(Locale.ROOT);
+            if (termina(bajo, FUERA) || bajo.equals("mkxp.json"))
                 continue;
-            }
-            String bajo = f.getName().toLowerCase(Locale.ROOT);
-            if (termina(bajo, FUERA) || (rel.isEmpty() && bajo.equals("mkxp.json")))
-                continue;
-            FileInputSource s = new FileInputSource(f, "assets/game/" + r);
+            InputSource s = o instanceof Origen.Carpeta
+                ? new FileInputSource(((Origen.Carpeta) o).archivo(r), "assets/game/" + r)
+                : new InputSource("assets/game/" + r) {
+                    @Override public java.io.InputStream openStream() throws java.io.IOException { return o.abrir(r); }
+                };
             if (termina(bajo, SIN_COMPRIMIR))
                 s.setMethod(ZipEntry.STORED); // ya vienen comprimidos; así el motor los lee directo
             apk.add(s);
             // Ahorrar espacio: igual que write_ligero de la PC (solo nombres ASCII, sin el .sf2)
-            String top = r.contains("/") ? r.substring(0, r.indexOf('/')).toLowerCase(Locale.ROOT) : "";
+            String top = r.contains("/") ? bajo.substring(0, r.indexOf('/')) : "";
             if (ahorrar && (top.equals("graphics") || top.equals("audio"))
                 && r.chars().allMatch(c -> c < 128) && !bajo.endsWith(".sf2"))
                 ligero.add(r);
@@ -180,13 +185,15 @@ public final class Constructor
     }
 
     /** mkxp.json del juego con lo que necesita Android (como stage_game de la PC). Solo ASCII. */
-    static String mkxpJson(File juego, String titulo, List<String> parches) throws Exception
+    static String mkxpJson(Origen juego, String titulo, List<String> parches) throws Exception
     {
         JSONObject conf = new JSONObject();
-        File propio = new File(juego, "mkxp.json");
-        if (propio.isFile()) {
-            try {
-                conf = new JSONObject(sinComentarios(new String(Files.readAllBytes(propio.toPath()), StandardCharsets.UTF_8)));
+        String propio = juego.buscar("mkxp.json");
+        if (propio != null) {
+            try (java.io.InputStream in = juego.abrir(propio)) {
+                java.io.ByteArrayOutputStream b = new java.io.ByteArrayOutputStream();
+                Juego.copiar(in, b);
+                conf = new JSONObject(sinComentarios(b.toString("UTF-8")));
             } catch (Exception ignored) {
                 conf = new JSONObject(); // con errores: se usa uno nuevo
             }
@@ -212,7 +219,10 @@ public final class Constructor
             load.put(".");
         conf.put("rubyLoadpath", load);
         if (conf.optString("midiSoundFont").isEmpty()) {
-            String sf2 = buscarSf2(juego, "", 0);
+            String sf2 = null;
+            for (String a : juego.archivos())
+                if (a.toLowerCase(Locale.ROOT).endsWith(".sf2") && a.split("/").length <= 4 && (sf2 == null || a.length() < sf2.length()))
+                    sf2 = a;
             if (sf2 != null)
                 conf.put("midiSoundFont", sf2);
         }
@@ -223,22 +233,6 @@ public final class Constructor
         return sb.toString();
     }
 
-    private static String buscarSf2(File dir, String rel, int nivel)
-    {
-        File[] hijos = dir.listFiles();
-        if (hijos == null || nivel > 3)
-            return null;
-        for (File f : hijos)
-            if (f.isFile() && f.getName().toLowerCase(Locale.ROOT).endsWith(".sf2"))
-                return rel + f.getName();
-        for (File f : hijos)
-            if (f.isDirectory()) {
-                String s = buscarSf2(f, rel + f.getName() + "/", nivel + 1);
-                if (s != null)
-                    return s;
-            }
-        return null;
-    }
 
     /** mkxp.json admite comentarios //; se quitan sin tocar lo que va entre comillas. */
     static String sinComentarios(String t)

@@ -12,10 +12,13 @@ android {
         targetSdk 34
         versionCode 1
         versionName '0.1'
+        buildConfigField 'String', 'ID', "\"${System.getenv('RPGMK_ID') ?: 'local'}\""
     }
 
     // Llave fija (la de depuración pública de Android, guardada en el repo): así cada versión
     // nueva se instala encima de la anterior. Los APK de los juegos usan otra firma, la del autor.
+    buildFeatures { buildConfig true }
+
     signingConfigs {
         fija {
             storeFile file('firma-app.jks')

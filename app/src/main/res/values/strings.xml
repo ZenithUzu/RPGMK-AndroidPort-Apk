@@ -11,7 +11,12 @@
     <string name="importar_zip_sub">El archivo tal como lo descargaste</string>
     <string name="elegir_carpeta">Elegir una carpeta</string>
     <string name="elegir_carpeta_sub">Si ya lo tienes descomprimido</string>
-    <string name="copiando">Copiando… %1$d archivos</string>
+    <string name="copiando">Leyendo… %1$d archivos</string>
+    <string name="archivos">%1$d archivos</string>
+    <string name="revisando">Revisando compatibilidad…</string>
+    <string name="compatible">Nada raro de Windows encontrado</string>
+    <string name="nueva_version">Hay una versión nueva de la app</string>
+    <string name="descargar">Descargar</string>
     <string name="sin_game_ini">No encontré Game.ini. Elige la carpeta del juego (o un .zip que la tenga).</string>
     <string name="error">No se pudo: %1$s</string>
     <string name="juego_listo">%1$s · %2$s</string>

@@ -26,7 +26,10 @@ jobs:
           curl -fL -o app/src/main/assets/plantilla.apk \
             https://github.com/ZenithUzu/RMXP-Android-Ports/releases/download/plantilla-ultima/plantilla.apk
       - name: Compilar
-        run: ./gradlew --no-daemon assembleRelease
+        run: |
+          # Id de esta versión (código + plantilla): la app lo compara para avisar si hay una nueva
+          echo "RPGMK_ID=${GITHUB_SHA::7}-$(sha256sum app/src/main/assets/plantilla.apk | cut -c1-7)" >> $GITHUB_ENV
+          RPGMK_ID=${GITHUB_SHA::7}-$(sha256sum app/src/main/assets/plantilla.apk | cut -c1-7) ./gradlew --no-daemon assembleRelease
       - name: Publicar
         env:
           GH_TOKEN: ${{ github.token }}
@@ -34,4 +37,4 @@ jobs:
           cp app/build/outputs/apk/release/app-release.apk RPGMK-Port.apk
           gh release delete ultima --yes --cleanup-tag || true
           gh release create ultima RPGMK-Port.apk --title "Última versión" \
-            --notes "Compilada de ${GITHUB_SHA::7}. Descarga RPGMK-Port.apk desde el teléfono e instálala."
+            --notes "Compilada de ${GITHUB_SHA::7}. id: ${RPGMK_ID}. Descarga RPGMK-Port.apk desde el teléfono e instálala."
