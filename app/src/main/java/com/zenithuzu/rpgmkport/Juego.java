@@ -49,13 +49,16 @@ public final class Juego
     static List<String> revisar(Origen o)
     {
         List<String> avisos = new ArrayList<>();
-        int dll = 0, video = 0;
+        int video = 0;
+        List<String> dlls = new ArrayList<>();
         for (String r : o.archivos()) {
             String b = r.toLowerCase(Locale.ROOT);
-            if (b.endsWith(".dll") && !b.startsWith("rgss") && !b.contains("/rgss")) dll++;
+            if (b.endsWith(".dll") && !b.startsWith("rgss") && !b.contains("/rgss")) dlls.add(r.substring(r.lastIndexOf('/') + 1));
             if (b.endsWith(".wmv") || b.endsWith(".avi") || b.endsWith(".mpg")) video++;
         }
-        if (dll > 0) avisos.add(dll + " .dll de Windows: lo que hagan no funcionará en Android");
+        if (!dlls.isEmpty())
+            avisos.add(dlls.size() + " .dll de Windows (" + String.join(", ", dlls.subList(0, Math.min(3, dlls.size())))
+                + (dlls.size() > 3 ? "…" : "") + "): lo que hagan no funcionará en Android");
         if (video > 0) avisos.add(video + " videos .wmv/.avi/.mpg: pásalos a .ogv para que se vean");
         for (String r : o.archivos())
             if (r.matches("(?i)Data/Scripts\\.(rxdata|rvdata2?)")) {
