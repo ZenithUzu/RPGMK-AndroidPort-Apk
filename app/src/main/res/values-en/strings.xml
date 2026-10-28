@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="bienvenido">Welcome</string>
-    <string name="titulo_app">RPG Maker fangames on Android</string>
-    <string name="intro">Turn an RPG Maker XP, VX or VX Ace fangame (like the ones made with Pokémon Essentials) into its own app, right from your phone. No PC, JoiPlay or Kirin needed: each game becomes an app with its own name, icon and its author\'s signature.\n\nIt uses the same engine as RMXP-Android-Ports (mkxp-z): the game really runs, there is no emulated Windows.\n\nStill in development. If something fails, save the log and report it on GitHub.</string>
     <string name="empezar">Get started</string>
     <string name="continuar">Continue</string>
     <string name="atras">Back</string>
-    <string name="paso">Step %1$d of %2$d</string>
 
     <string name="juego_titulo">Choose the game</string>
     <string name="juego_texto">You need the PC game files: the folder with Game.ini, or the .zip as you downloaded it. It is copied into this app; the original is not touched.</string>
@@ -50,4 +46,13 @@
     <string name="permiso_instalar">Android asks you to allow this app to install apps. Turn it on, come back and tap Create again.</string>
     <string name="guardar_apk">Save the APK</string>
     <string name="apk_guardado">APK saved</string>
+    <string name="lema">Your RPG Maker XP, VX and VX Ace fangames, turned into Android apps right on your phone. No PC and no other app in between.</string>
+    <string name="como_funciona">How it works</string>
+    <string name="como_1">Choose the game: its .zip or folder</string>
+    <string name="como_2">Check name, author, icon and signature</string>
+    <string name="como_3">Create the app and install it</string>
+    <string name="nota_motor">Uses the mkxp-z engine from RMXP-Android-Ports, the same as the PC tool. In testing: if something fails, report it on GitHub with the game\'s log.</string>
+    <string name="paso_juego">Game</string>
+    <string name="paso_datos">Details</string>
+    <string name="paso_crear">Create</string>
 </resources>

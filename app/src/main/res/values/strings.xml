@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">RPGMK Port</string>
-    <string name="bienvenido">Bienvenido</string>
-    <string name="titulo_app">Fangames de RPG Maker en Android</string>
-    <string name="intro">Convierte un fangame de RPG Maker XP, VX o VX Ace (como los hechos con Pokémon Essentials) en una app propia, desde el teléfono. No hace falta PC, JoiPlay ni Kirin: cada juego queda como una app con su nombre, su icono y la firma de su autor.\n\nUsa el mismo motor que RMXP-Android-Ports (mkxp-z): el juego corre de verdad, no hay Windows emulado.\n\nSigue en desarrollo. Si algo falla, guarda el registro (log) y repórtalo en GitHub.</string>
     <string name="empezar">Empezar</string>
     <string name="continuar">Continuar</string>
     <string name="atras">Atrás</string>
-    <string name="paso">Paso %1$d de %2$d</string>
 
     <string name="juego_titulo">Elige el juego</string>
     <string name="juego_texto">Necesitas los archivos del juego para PC: la carpeta que trae Game.ini, o el .zip tal como lo descargaste. Se copia dentro de esta app; el original no se toca.</string>
@@ -51,4 +47,13 @@
     <string name="permiso_instalar">Android pide permitir que esta app instale apps. Actívalo, vuelve y presiona Crear otra vez.</string>
     <string name="guardar_apk">Guardar el APK</string>
     <string name="apk_guardado">APK guardado</string>
+    <string name="lema">Tus fangames de RPG Maker XP, VX y VX Ace, convertidos en apps de Android desde el mismo teléfono. Sin PC y sin otra app de por medio.</string>
+    <string name="como_funciona">Así funciona</string>
+    <string name="como_1">Elige el juego: el .zip o su carpeta</string>
+    <string name="como_2">Revisa nombre, autor, icono y firma</string>
+    <string name="como_3">Crea la app e instálala</string>
+    <string name="nota_motor">Usa el motor mkxp-z de RMXP-Android-Ports, el mismo de la herramienta para PC. En pruebas: si algo falla, cuéntalo en GitHub con el registro del juego.</string>
+    <string name="paso_juego">Juego</string>
+    <string name="paso_datos">Datos</string>
+    <string name="paso_crear">Crear</string>
 </resources>

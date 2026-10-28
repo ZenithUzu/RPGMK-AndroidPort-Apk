@@ -18,33 +18,28 @@
         android:paddingTop="12dp"
         android:paddingEnd="20dp">
 
-        <FrameLayout
+        <!-- Atrás + pasos numerados (1 Juego · 2 Datos · 3 Crear) -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="56dp">
+            android:layout_height="56dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/atras"
-                style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_gravity="center_vertical|start"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:contentDescription="@string/atras"
                 app:icon="@drawable/ic_atras" />
-            <TextView
-                android:id="@+id/paso"
-                style="@style/Rpg.Etiqueta"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/barras"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:letterSpacing="0.12" />
-        </FrameLayout>
-
-        <!-- Una barra por paso -->
-        <LinearLayout
-            android:id="@+id/barras"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:orientation="horizontal" />
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" />
+        </LinearLayout>
     </LinearLayout>
 
     <ScrollView

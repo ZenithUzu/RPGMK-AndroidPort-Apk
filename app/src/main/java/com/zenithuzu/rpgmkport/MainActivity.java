@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity
     private boolean mAhorrar, mOcupado;
 
     private View mCabecera;
-    private TextView mTextoPaso, mAyuda;
+    private TextView mAyuda;
     private LinearLayout mBarras;
     private FrameLayout mContenido;
     private MaterialButton mSiguiente;
@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(state);
         setContentView(R.layout.activity_main);
         mCabecera = findViewById(R.id.cabecera);
-        mTextoPaso = findViewById(R.id.paso);
         mAyuda = findViewById(R.id.ayuda);
         mBarras = findViewById(R.id.barras);
         mContenido = findViewById(R.id.contenido);
@@ -151,7 +150,6 @@ public class MainActivity extends AppCompatActivity
         mPaso = paso;
         mContenido.removeAllViews();
         mCabecera.setVisibility(paso == 0 ? View.GONE : View.VISIBLE);
-        mTextoPaso.setText(getString(R.string.paso, paso, PASOS));
         dibujarBarras(paso);
         mAyuda.setVisibility(View.GONE);
         mSiguiente.setEnabled(true);
@@ -160,10 +158,19 @@ public class MainActivity extends AppCompatActivity
         switch (paso) {
             case 0:
                 View v = inflar(R.layout.paso_bienvenida);
-                GradientDrawable circulo = new GradientDrawable();
-                circulo.setShape(GradientDrawable.OVAL);
-                circulo.setColor(MaterialColors.getColor(v, com.google.android.material.R.attr.colorPrimaryContainer));
-                v.findViewById(R.id.circulo).setBackground(circulo);
+                LinearLayout como = v.findViewById(R.id.como);
+                int[] pasos = { R.string.como_1, R.string.como_2, R.string.como_3 };
+                for (int i = 0; i < pasos.length; i++) {
+                    LinearLayout fila = new LinearLayout(this);
+                    fila.setGravity(android.view.Gravity.CENTER_VERTICAL);
+                    fila.setPadding(0, dp(10), 0, 0);
+                    fila.addView(numero(i + 1, false, false), new LinearLayout.LayoutParams(dp(28), dp(28)));
+                    TextView t = new TextView(this, null, 0, R.style.Rpg_Cuerpo);
+                    t.setText(pasos[i]);
+                    t.setPadding(dp(14), 0, 0, 0);
+                    fila.addView(t);
+                    como.addView(fila);
+                }
                 mSiguiente.setText(R.string.empezar);
                 break;
             case 1:
@@ -177,23 +184,53 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /** Pasos numerados unidos por líneas: hechos con ✓, el actual relleno, los demás con borde. */
     private void dibujarBarras(int paso)
     {
         mBarras.removeAllViews();
-        float dp = getResources().getDisplayMetrics().density;
+        int[] nombres = { R.string.paso_juego, R.string.paso_datos, R.string.paso_crear };
         for (int i = 1; i <= PASOS; i++) {
-            View b = new View(this);
-            GradientDrawable d = new GradientDrawable();
-            d.setCornerRadius(4 * dp);
-            d.setColor(MaterialColors.getColor(mBarras, i <= paso
-                ? androidx.appcompat.R.attr.colorPrimary
-                : com.google.android.material.R.attr.colorSurfaceContainerHighest));
-            b.setBackground(d);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, Math.round(4 * dp), 1);
-            lp.setMarginStart(i == 1 ? 0 : Math.round(4 * dp));
-            mBarras.addView(b, lp);
+            if (i > 1) {
+                View linea = new View(this);
+                linea.setBackgroundColor(color(i <= paso ? androidx.appcompat.R.attr.colorPrimary
+                    : com.google.android.material.R.attr.colorOutlineVariant));
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, dp(2), 1);
+                lp.setMargins(dp(6), 0, dp(6), 0);
+                mBarras.addView(linea, lp);
+            }
+            mBarras.addView(numero(i, i < paso, i == paso), new LinearLayout.LayoutParams(dp(26), dp(26)));
+            if (i == paso) {
+                TextView t = new TextView(this);
+                t.setText(nombres[i - 1]);
+                t.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_LabelLarge);
+                t.setTextColor(color(com.google.android.material.R.attr.colorOnSurface));
+                t.setPadding(dp(8), 0, 0, 0);
+                mBarras.addView(t);
+            }
         }
     }
+
+    /** Círculo con número (o ✓ si ya se hizo). */
+    private TextView numero(int n, boolean hecho, boolean actual)
+    {
+        TextView t = new TextView(this);
+        t.setGravity(android.view.Gravity.CENTER);
+        t.setText(hecho ? "✓" : String.valueOf(n));
+        t.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_LabelLarge);
+        GradientDrawable d = new GradientDrawable();
+        d.setShape(GradientDrawable.OVAL);
+        if (hecho || actual) {
+            d.setColor(color(androidx.appcompat.R.attr.colorPrimary));
+            t.setTextColor(color(com.google.android.material.R.attr.colorOnPrimary));
+        } else {
+            d.setColor(color(com.google.android.material.R.attr.colorSecondaryContainer));
+            t.setTextColor(color(com.google.android.material.R.attr.colorOnSecondaryContainer));
+        }
+        t.setBackground(d);
+        return t;
+    }
+
+    private int color(int attr) { return MaterialColors.getColor(mContenido, attr); }
 
     private View inflar(int layout)
     {
