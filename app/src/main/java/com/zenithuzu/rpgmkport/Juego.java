@@ -53,7 +53,9 @@ public final class Juego
         List<String> dlls = new ArrayList<>();
         for (String r : o.archivos()) {
             String b = r.toLowerCase(Locale.ROOT);
-            if (b.endsWith(".dll") && !b.startsWith("rgss") && !b.contains("/rgss")) dlls.add(r.substring(r.lastIndexOf('/') + 1));
+            String f = b.substring(b.lastIndexOf('/') + 1);
+            // Las del propio motor de PC (rgss, ruby, zlib) no hacen falta: Android trae las suyas
+            if (f.endsWith(".dll") && !f.startsWith("rgss") && !f.contains("ruby") && !f.equals("zlib1.dll")) dlls.add(r.substring(r.lastIndexOf('/') + 1));
             if (b.endsWith(".wmv") || b.endsWith(".avi") || b.endsWith(".mpg")) video++;
         }
         if (!dlls.isEmpty())
