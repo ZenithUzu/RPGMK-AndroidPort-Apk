@@ -4,13 +4,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 /**
  * De dónde se leen los archivos del juego, sin copiarlo antes: una carpeta o el .zip tal cual.
@@ -67,29 +64,26 @@ public abstract class Origen
 
     // ------------------------------------------------------------------ .zip
 
-    /** El .zip leído directo (se abre por su ruta, también /proc/self/fd/N de un archivo elegido). */
+    /** El .zip leído directo, por su canal (sirve para archivos elegidos con el selector de Android). */
     public static class Zip extends Origen
     {
-        private final ZipFile zip;
+        private final org.apache.commons.compress.archivers.zip.ZipFile zip;
         private final String prefijo;   // carpeta dentro del zip que tiene Game.ini ("" si es la raíz)
         private final String nombre;
         private final List<String> lista = new ArrayList<>();
 
         public Zip(String ruta, String nombre) throws IOException
         {
+            this(java.nio.channels.FileChannel.open(new File(ruta).toPath()), nombre);
+        }
+
+        public Zip(java.nio.channels.SeekableByteChannel canal, String nombre) throws IOException
+        {
             this.nombre = nombre;
-            ZipFile z;
-            try {
-                z = new ZipFile(ruta);
-                z.size();
-                leerNombres(z); // nombres raros fallan aquí
-            } catch (IllegalArgumentException | java.util.zip.ZipException e) {
-                // Zips de Windows con ñ o acentos: codificación vieja (CP437)
-                z = new ZipFile(new File(ruta), Charset.forName("Cp437"));
-            }
-            zip = z;
+            // Nombres sin marca UTF-8 (zips de Windows con ñ o acentos): codificación vieja CP437
+            zip = new org.apache.commons.compress.archivers.zip.ZipFile(canal, nombre, "Cp437", true);
             String ini = null;
-            for (Enumeration<? extends ZipEntry> en = zip.entries(); en.hasMoreElements(); ) {
+            for (Enumeration<org.apache.commons.compress.archivers.zip.ZipArchiveEntry> en = zip.getEntries(); en.hasMoreElements(); ) {
                 String n = en.nextElement().getName();
                 String bajo = n.toLowerCase(Locale.ROOT);
                 if ((bajo.equals("game.ini") || bajo.endsWith("/game.ini")) && n.split("/").length <= 4
@@ -99,17 +93,11 @@ public abstract class Origen
             if (ini == null)
                 throw new Juego.SinGameIni();
             prefijo = ini.substring(0, ini.length() - "game.ini".length());
-            for (Enumeration<? extends ZipEntry> en = zip.entries(); en.hasMoreElements(); ) {
-                ZipEntry e = en.nextElement();
+            for (Enumeration<org.apache.commons.compress.archivers.zip.ZipArchiveEntry> en = zip.getEntries(); en.hasMoreElements(); ) {
+                org.apache.commons.compress.archivers.zip.ZipArchiveEntry e = en.nextElement();
                 if (!e.isDirectory() && e.getName().startsWith(prefijo) && !e.getName().contains("../"))
                     lista.add(e.getName().substring(prefijo.length()));
             }
-        }
-
-        private static void leerNombres(ZipFile z)
-        {
-            for (Enumeration<? extends ZipEntry> en = z.entries(); en.hasMoreElements(); )
-                en.nextElement().getName();
         }
 
         @Override public String nombre() { return nombre; }

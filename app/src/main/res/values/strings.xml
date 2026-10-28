@@ -6,7 +6,7 @@
     <string name="atras">Atrás</string>
 
     <string name="juego_titulo">Elige el juego</string>
-    <string name="juego_texto">Necesitas los archivos del juego para PC: la carpeta que trae Game.ini, o el .zip tal como lo descargaste. Se copia dentro de esta app; el original no se toca.</string>
+    <string name="juego_texto">Necesitas los archivos del juego para PC: la carpeta que trae Game.ini, o el .zip tal como lo descargaste. Se lee directo, sin copiarlo; el original no se toca.</string>
     <string name="importar_zip">Importar un .zip</string>
     <string name="importar_zip_sub">El archivo tal como lo descargaste</string>
     <string name="elegir_carpeta">Elegir una carpeta</string>

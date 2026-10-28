@@ -55,4 +55,5 @@ dependencies {
     implementation 'androidx.documentfile:documentfile:1.0.1'
     implementation 'io.github.reandroid:ARSCLib:1.3.5'      // editar el APK (id, nombre, icono)
     implementation 'com.android.tools.build:apksig:8.13.0'  // firmar, la misma de Android Studio
+    implementation 'org.apache.commons:commons-compress:1.21' // leer el .zip elegido sin copiarlo
 }

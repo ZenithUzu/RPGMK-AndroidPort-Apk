@@ -110,7 +110,8 @@ public final class Juego
         if (pfd == null)
             throw new IOException("no se pudo abrir el .zip");
         ABIERTOS.add(pfd); // debe seguir abierto mientras se usa
-        return new Origen.Zip("/proc/self/fd/" + pfd.getFd(), nombreDe(c, zip));
+        // Se lee por el canal ya abierto: reabrir /proc/self/fd/N lo niegan algunos teléfonos
+        return new Origen.Zip(new FileInputStream(pfd.getFileDescriptor()).getChannel(), nombreDe(c, zip));
     }
 
     private static final List<Object> ABIERTOS = new ArrayList<>();
