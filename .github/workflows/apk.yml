@@ -21,7 +21,7 @@ jobs:
         run: |
           mkdir -p app/src/main/assets
           curl -fL -o app/src/main/assets/plantilla.apk \
-            https://github.com/ZenithUzu/RMXP-Android-Ports/releases/download/plantilla-v1/plantilla.apk
+            https://github.com/ZenithUzu/RMXP-Android-Ports/releases/download/plantilla-v2/plantilla.apk
       - name: Compilar
         run: ./gradlew --no-daemon assembleRelease
       - name: Publicar

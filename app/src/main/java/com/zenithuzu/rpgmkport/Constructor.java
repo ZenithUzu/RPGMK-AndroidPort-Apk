@@ -36,6 +36,7 @@ public final class Constructor
         public String titulo, version;
         public long versionCode;
         public byte[] iconoPng;          // null = el icono de la plantilla
+        public byte[] fondoPng;          // fondo del icono (gris, negro o blanco); null = el de la plantilla
         public boolean ahorrar;          // "Ahorrar espacio": Graphics/Audio se leen del APK
         public List<String> abis = new ArrayList<>(); // vacía = todas las de la plantilla
     }
@@ -65,17 +66,20 @@ public final class Constructor
         for (ResXmlElement a : m.listActivities())
             ponerNombre(a, d.titulo);
 
-        // Icono: los mismos archivos que usa un juego con icono propio en la PC
-        if (d.iconoPng != null)
-            for (ResFile rf : apk.listResFiles()) {
-                Entry e = rf.pickOne();
-                boolean icono = ("mipmap".equals(e.getTypeName()) && "ic_launcher".equals(e.getName()))
-                    || ("drawable".equals(e.getTypeName()) && "rmxp_game_icon".equals(e.getName()));
-                if (icono && rf.getFilePath().endsWith(".png")) {
-                    apk.removeInputSource(rf.getFilePath());
-                    apk.add(new ByteInputSource(d.iconoPng, rf.getFilePath()));
-                }
+        // Icono y su fondo: los mismos archivos que usa un juego con icono propio en la PC
+        for (ResFile rf : apk.listResFiles()) {
+            Entry e = rf.pickOne();
+            if (!rf.getFilePath().endsWith(".png"))
+                continue;
+            boolean icono = ("mipmap".equals(e.getTypeName()) && "ic_launcher".equals(e.getName()))
+                || ("drawable".equals(e.getTypeName()) && "rmxp_game_icon".equals(e.getName()));
+            boolean fondo = "drawable".equals(e.getTypeName()) && "rmxp_icon_fondo".equals(e.getName());
+            byte[] nuevo = icono ? d.iconoPng : fondo ? d.fondoPng : null;
+            if (nuevo != null) {
+                apk.removeInputSource(rf.getFilePath());
+                apk.add(new ByteInputSource(nuevo, rf.getFilePath()));
             }
+        }
 
         // Solo el motor que usa este teléfono (el APK pesa la mitad)
         if (!d.abis.isEmpty())

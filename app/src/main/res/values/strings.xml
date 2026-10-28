@@ -56,4 +56,8 @@
     <string name="paso_juego">Juego</string>
     <string name="paso_datos">Datos</string>
     <string name="paso_crear">Crear</string>
+    <string name="fondo_icono">Fondo del icono</string>
+    <string name="fondo_gris">Gris</string>
+    <string name="fondo_negro">Negro</string>
+    <string name="fondo_blanco">Blanco</string>
 </resources>

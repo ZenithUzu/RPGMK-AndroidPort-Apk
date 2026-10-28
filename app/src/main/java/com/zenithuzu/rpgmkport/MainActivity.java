@@ -39,6 +39,8 @@ public class MainActivity extends AppCompatActivity
     private Juego.Info mInfo;
     private Uri mIcono;
     private boolean mAhorrar, mOcupado;
+    private int mFondo;             // fondo del icono: 0 gris, 1 negro, 2 blanco
+    private static final int[] FONDOS = { 0xFF5F6368, 0xFF000000, 0xFFFFFFFF };
 
     private View mCabecera;
     private TextView mAyuda;
@@ -356,6 +358,28 @@ public class MainActivity extends AppCompatActivity
         }
         icono.setOnClickListener(x -> mElegirIcono.launch(new String[] { "image/png" }));
 
+        // Fondo del icono (igual que en la herramienta de PC)
+        com.google.android.material.button.MaterialButtonToggleGroup fondos = new com.google.android.material.button.MaterialButtonToggleGroup(this);
+        fondos.setSingleSelection(true);
+        fondos.setSelectionRequired(true);
+        int[] nombres = { R.string.fondo_gris, R.string.fondo_negro, R.string.fondo_blanco };
+        for (int i = 0; i < nombres.length; i++) {
+            MaterialButton b = new MaterialButton(this, null, com.google.android.material.R.attr.materialButtonOutlinedStyle);
+            b.setId(View.generateViewId());
+            b.setText(nombres[i]);
+            b.setTag(i);
+            fondos.addView(b, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+            if (i == mFondo)
+                fondos.check(b.getId());
+        }
+        fondos.addOnButtonCheckedListener((g, id, on) -> { if (on) mFondo = (int) g.findViewById(id).getTag(); });
+        TextView tf = new TextView(this, null, 0, R.style.Rpg_Cuerpo);
+        tf.setText(R.string.fondo_icono);
+        tf.setPadding(0, dp(16), 0, dp(4));
+        LinearLayout lv = (LinearLayout) v;
+        lv.addView(tf, lv.indexOfChild(icono) + 1);
+        lv.addView(fondos, lv.indexOfChild(tf) + 1, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
         // El contenido va dentro del encabezado anterior para que todo se desplace junto
         mContenido.removeView(v);
         LinearLayout box = (LinearLayout) mContenido.getChildAt(0);
@@ -549,6 +573,12 @@ public class MainActivity extends AppCompatActivity
                         d.abis.add(abi); // solo el motor de este teléfono
                         break;
                     }
+                // Fondo del icono: un PNG de un color, como el de la PC
+                android.graphics.Bitmap bmp = android.graphics.Bitmap.createBitmap(108, 108, android.graphics.Bitmap.Config.ARGB_8888);
+                bmp.eraseColor(FONDOS[mFondo]);
+                java.io.ByteArrayOutputStream fb = new java.io.ByteArrayOutputStream();
+                bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, fb);
+                d.fondoPng = fb.toByteArray();
                 if (mIcono != null)
                     try (java.io.InputStream in = getContentResolver().openInputStream(mIcono)) {
                         java.io.ByteArrayOutputStream b = new java.io.ByteArrayOutputStream();
