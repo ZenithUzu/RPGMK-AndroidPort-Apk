@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # Cada día: así toma sola la plantilla más nueva de RMXP-Android-Ports
+  schedule:
+    - cron: "17 9 * * *"
 
 permissions:
   contents: write
@@ -21,7 +24,7 @@ jobs:
         run: |
           mkdir -p app/src/main/assets
           curl -fL -o app/src/main/assets/plantilla.apk \
-            https://github.com/ZenithUzu/RMXP-Android-Ports/releases/download/plantilla-v3/plantilla.apk
+            https://github.com/ZenithUzu/RMXP-Android-Ports/releases/download/plantilla-ultima/plantilla.apk
       - name: Compilar
         run: ./gradlew --no-daemon assembleRelease
       - name: Publicar
