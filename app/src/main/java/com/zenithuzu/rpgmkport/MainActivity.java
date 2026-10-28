@@ -374,7 +374,7 @@ public class MainActivity extends AppCompatActivity
         opcion(box, R.drawable.ic_carpeta, getString(R.string.importar_firma), getString(R.string.importar_firma_sub),
             x -> mImportarFirma.launch(new String[] { "*/*" }));
         opcion(box, R.drawable.ic_zip, getString(R.string.exportar_firma), getString(R.string.exportar_firma_sub),
-            x -> { if (firmaGuardada() != null) mExportarFirma.launch(null); });
+            x -> exportar());
     }
 
     private TextView mEstadoFirma;
@@ -430,6 +430,23 @@ public class MainActivity extends AppCompatActivity
         } catch (Exception e) {
             aviso(e instanceof IllegalArgumentException ? e.getMessage() : getString(R.string.error, e.getMessage()));
         }
+    }
+
+    /** Si el juego aún no tiene firma (no se ha creado el APK), se crea ahora para poder exportarla. */
+    private void exportar()
+    {
+        guardarDatos();
+        if (firmaGuardada() == null) {
+            try {
+                Firma.crear(carpetaFirma(), "com." + Juego.slug(mInfo.autor, "fangame") + "."
+                    + Juego.slug(mInfo.titulo, "juego"), mInfo.autor, mInfo.titulo);
+            } catch (Exception e) {
+                aviso(getString(R.string.error, e.getMessage()));
+                return;
+            }
+            mostrarFirma();
+        }
+        mExportarFirma.launch(null);
     }
 
     private void exportarFirma(Uri arbol)
