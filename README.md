@@ -24,6 +24,10 @@ La IA puede equivocarse: su participación no garantiza que el código sea corre
 
 Estas herramientas no son autoras de los motores ni de las bibliotecas de terceros. Su mención tampoco implica afiliación, patrocinio o respaldo de OpenAI o Anthropic.
 
+## Versión 0.5
+
+Incluye la plantilla compartida con apertura manual de «Mando y teclado», letras pequeñas configurables en editor y juego, y barra del editor movible desde ⠿. Añade registros `RMXP PANTALLA` de brillo y transiciones para investigar el oscurecimiento de algunos juegos; ese fallo sigue en diagnóstico. Para aplicar los cambios a un juego instalado, vuelve a crear su APK y actualízalo conservando su identificador y firma.
+
 ## Requisitos
 
 - **Android 8.0 o posterior**. Los colores dinámicos de Material You requieren Android 12 o posterior.

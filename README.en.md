@@ -24,6 +24,10 @@ AI can make mistakes. Its involvement does not guarantee correct, secure code or
 
 These tools did not author the third-party engines or libraries. Mentioning them does not imply affiliation, sponsorship or endorsement by OpenAI or Anthropic.
 
+## Version 0.5
+
+Includes the shared template with manually opened controller settings, optional small key labels in both editor and game, and an editor toolbar draggable from ⠿. Adds `RMXP PANTALLA` brightness and transition logs to investigate dark screens; this issue remains under investigation. Rebuild an installed game and update it using the same application ID and signing key to apply these changes.
+
 ## Requirements
 
 - **Android 8.0 or later**. Material You dynamic colors require Android 12 or later.
