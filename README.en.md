@@ -26,7 +26,7 @@ These tools did not author the third-party engines or libraries. Mentioning them
 
 ## Version 0.6 · Portémon
 
-New identity and workspace: direct ZIP/folder access, compact project navigation and Android dynamic colors. Keeps the application ID, app signing key and game signing keys, so it updates RPGMK Port in place. The former `RPGMK-Port.apk` download remains available for compatibility. Existing build-file and copy handling is unchanged.
+New identity and workspace: direct ZIP/folder access, compact project navigation and Android dynamic colors. Keeps the application ID, app signing key and game signing keys, so it updates RPGMK Port in place. The release distributes a single APK: `Portemon.apk`. Existing build-file and copy handling is unchanged.
 
 ## Version 0.5
 

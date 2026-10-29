@@ -26,7 +26,7 @@ Estas herramientas no son autoras de los motores ni de las bibliotecas de tercer
 
 ## Versión 0.6 · Portémon
 
-Nueva identidad e interfaz: inicio con acceso directo a ZIP o carpeta, navegación compacta del proyecto y colores dinámicos de Android. Mantiene el identificador de la app, su firma y las firmas de los juegos, por lo que se instala como actualización de RPGMK Port. El enlace anterior `RPGMK-Port.apk` sigue disponible por compatibilidad. Los archivos y copias del flujo de creación mantienen su funcionamiento actual.
+Nueva identidad e interfaz: inicio con acceso directo a ZIP o carpeta, navegación compacta del proyecto y colores dinámicos de Android. Mantiene el identificador de la app, su firma y las firmas de los juegos, por lo que se instala como actualización de RPGMK Port. La publicación distribuye un único APK: `Portemon.apk`. Los archivos y copias del flujo de creación mantienen su funcionamiento actual.
 
 ## Versión 0.5
 
