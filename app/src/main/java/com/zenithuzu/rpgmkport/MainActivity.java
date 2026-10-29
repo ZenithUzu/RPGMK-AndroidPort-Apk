@@ -645,7 +645,7 @@ public class MainActivity extends AppCompatActivity
         mSiguiente.setEnabled(!mOcupado);
     }
 
-    /** Arma el APK con la plantilla, lo firma e inicia la instalación. */
+    /** Arma y firma el APK; instalarlo es una acción independiente. */
     private void crear()
     {
         if (mJuego == null || mInfo == null || mOcupado) return;

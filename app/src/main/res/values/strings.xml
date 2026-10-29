@@ -47,7 +47,7 @@
     <string name="firma_exportada">Firma guardada</string>
     <string name="instalando">Instalando…</string>
     <string name="instalado">¡Listo! Ya puedes abrir el juego desde tus apps.</string>
-    <string name="conflicto">La firma no coincide con la del juego instalado. Importa su firma desde Datos → Firma y vuelve a crear el APK. No necesitas desinstalar el juego.</string>
+    <string name="conflicto">La firma no coincide con la del juego instalado. Para actualizarlo, importa su firma original desde Datos → Firma y vuelve a crear el APK.</string>
     <string name="fallo_instalar">No se instaló: %1$s</string>
     <string name="permiso_instalar">Android pide permitir que esta app instale apps. Actívalo, vuelve y presiona Crear otra vez.</string>
     <string name="guardar_apk">Guardar el APK</string>

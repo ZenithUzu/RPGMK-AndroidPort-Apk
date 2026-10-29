@@ -41,7 +41,7 @@
     <string name="firma_exportada">Signature saved</string>
     <string name="instalando">Installing…</string>
     <string name="instalado">Done! You can open the game from your apps.</string>
-    <string name="conflicto">The signing key differs from the installed game. Import its key from Details → Signing key and rebuild. You do not need to uninstall the game.</string>
+    <string name="conflicto">The signing key differs from the installed game. To update it, import its original key from Details → Signing key and rebuild.</string>
     <string name="fallo_instalar">Not installed: %1$s</string>
     <string name="permiso_instalar">Android asks you to allow this app to install apps. Turn it on, come back and tap Create again.</string>
     <string name="guardar_apk">Save the APK</string>
