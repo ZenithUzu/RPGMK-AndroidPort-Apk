@@ -30,7 +30,7 @@ New identity and workspace: direct ZIP/folder access, compact project navigation
 
 ## Version 0.5
 
-Includes the shared template with manually opened controller settings, optional small key labels in both editor and game, and an editor toolbar draggable from ⠿. Adds `RMXP PANTALLA` brightness and transition logs to investigate dark screens; this issue remains under investigation. Rebuild an installed game and update it using the same application ID and signing key to apply these changes.
+Includes the shared template with manually opened controller settings, optional small key labels in both editor and game, and an editor toolbar draggable from ⠿. Adds `RMXP PANTALLA` brightness and transition logs to investigate dark screens; this issue remains under investigation. The observer avoids recursion with the `Graphics` aliases used by Essentials and Relict. Rebuild an installed game and update it using the same application ID and signing key to apply these changes.
 
 ## Requirements
 

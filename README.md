@@ -30,7 +30,7 @@ Nueva identidad e interfaz: inicio con acceso directo a ZIP o carpeta, navegaci�
 
 ## Versión 0.5
 
-Incluye la plantilla compartida con apertura manual de «Mando y teclado», letras pequeñas configurables en editor y juego, y barra del editor movible desde ⠿. Añade registros `RMXP PANTALLA` de brillo y transiciones para investigar el oscurecimiento de algunos juegos; ese fallo sigue en diagnóstico. Para aplicar los cambios a un juego instalado, vuelve a crear su APK y actualízalo conservando su identificador y firma.
+Incluye la plantilla compartida con apertura manual de «Mando y teclado», letras pequeñas configurables en editor y juego, y barra del editor movible desde ⠿. Añade registros `RMXP PANTALLA` de brillo y transiciones para investigar el oscurecimiento de algunos juegos; ese fallo sigue en diagnóstico. El observador evita recursión con los alias de `Graphics` usados por Essentials y Relict. Para aplicar los cambios a un juego instalado, vuelve a crear su APK y actualízalo conservando su identificador y firma.
 
 ## Requisitos
 
