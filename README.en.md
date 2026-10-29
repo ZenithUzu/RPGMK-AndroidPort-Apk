@@ -136,3 +136,7 @@ This project's code is published under [GPL-2.0-or-later](LICENSE). Third-party 
 An independent project, without affiliation or endorsement from Nintendo, The Pokémon Company, Game Freak, the RPG Maker rights holders or fangame authors. Trademarks and assets belong to their respective owners.
 
 The software is provided without warranty under its license. AI assistance does not alter third-party rights or credits.
+
+### In-game appearance
+
+The shared template includes side panels for button, label/symbol and key-badge colors, #RRGGBB input and continuous 0–100% opacity. The performance overlay offers data selection, compact/list layout, text color and size, background opacity and position. Android 12+ wallpaper colors still theme the interface; manual colors remain fixed. Rebuild and install an existing game APK with the same signing key to update its runtime UI.

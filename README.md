@@ -136,3 +136,7 @@ El código de este proyecto se publica bajo [GPL-2.0-or-later](LICENSE). Los com
 Proyecto independiente, sin afiliación ni respaldo de Nintendo, The Pokémon Company, Game Freak, los responsables de RPG Maker ni los autores de los fangames. Las marcas y recursos pertenecen a sus respectivos titulares.
 
 El software se ofrece sin garantía, según su licencia. La asistencia con IA no modifica los derechos ni los créditos de terceros.
+
+### Personalización dentro del juego
+
+La plantilla compartida incorpora paneles laterales para el color y la opacidad de botones, letras/símbolos e insignias de teclas, con selector de color, entrada #RRGGBB y opacidad continua de 0–100 %. El medidor permite elegir datos, formato compacto/lista, color, tamaño, fondo y posición. La interfaz mantiene los colores dinámicos del fondo de pantalla en Android 12+; los colores elegidos manualmente se conservan. Para actualizar un juego existente, vuelve a crear e instalar su APK conservando la misma firma.
