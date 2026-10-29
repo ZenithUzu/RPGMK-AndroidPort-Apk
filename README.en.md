@@ -12,6 +12,8 @@ emulated Windows.
 
 > **Status: testing.** It already builds, signs and installs the APK. It still needs testing on more phones and games.
 
+Version **0.4** includes engine **v13**: music pauses with the game, size/opacity editing and FPS limiting are fixed, and Xbox/Switch profiles cover the D-pad, both sticks and triggers in the side panel. Rebuild game APKs and update using the same signing key.
+
 ## How to use it
 
 1. Download **RPGMK-Port.apk** from the [latest release](https://github.com/ZenithUzu/RPGMK-AndroidPort-Apk/releases/tag/ultima) and install it.

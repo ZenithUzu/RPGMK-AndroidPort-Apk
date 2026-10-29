@@ -13,6 +13,8 @@ no hay Windows emulado.
 
 > **Estado: en pruebas.** Ya arma, firma e instala el APK. Falta probarlo en más teléfonos y juegos.
 
+La versión **0.4** incorpora el motor **v13**: pausa también la música, corrige tamaño y opacidad del editor y el limitador de FPS, y añade perfiles Xbox/Switch con cruceta, ambos sticks y gatillos en el panel lateral. Para recibirlo en un juego, vuelve a crear su APK y actualiza con la misma firma. [Pruebas y asignaciones](https://github.com/ZenithUzu/RMXP-Android-Ports/blob/main/docs/pruebas-ports.md#motor-v13-pausa-personalización-y-mandos).
+
 ## Cómo se usa
 
 1. Descarga **RPGMK-Port.apk** de la [última versión](https://github.com/ZenithUzu/RPGMK-AndroidPort-Apk/releases/tag/ultima) e instálala.
