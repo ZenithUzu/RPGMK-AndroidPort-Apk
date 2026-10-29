@@ -13,6 +13,7 @@ android {
         versionCode 6
         versionName '0.6'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        buildConfigField 'long', 'BUILT_AT', "${System.currentTimeMillis()}L"
         buildConfigField 'String', 'ID', "\"${System.getenv('RPGMK_ID') ?: 'local'}\""
     }
 

@@ -25,13 +25,13 @@ final class Novedades
                 HttpURLConnection c = (HttpURLConnection) new URL(API).openConnection();
                 c.setConnectTimeout(5000);
                 c.setReadTimeout(5000);
-                String notas;
+                org.json.JSONObject release;
                 try (InputStream in = c.getInputStream()) {
                     java.io.ByteArrayOutputStream b = new java.io.ByteArrayOutputStream();
                     Juego.copiar(in, b);
-                    notas = new org.json.JSONObject(b.toString("UTF-8")).optString("body");
+                    release = new org.json.JSONObject(b.toString("UTF-8"));
                 }
-                if (!notas.contains("id: ") || notas.contains(BuildConfig.ID))
+                if (!masReciente(release, BuildConfig.ID, BuildConfig.BUILT_AT))
                     return;
                 a.runOnUiThread(() -> Snackbar.make(a.findViewById(android.R.id.content), R.string.nueva_version, Snackbar.LENGTH_INDEFINITE)
                     .setAction(R.string.descargar, v -> a.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(BAJAR))))
@@ -41,4 +41,15 @@ final class Novedades
             }
         }).start();
     }
+    static boolean masReciente(org.json.JSONObject release, String id, long builtAt)
+    {
+        String notes = release.optString("body");
+        if (!notes.contains("id: ") || notes.contains(id)) return false;
+        try {
+            return java.time.Instant.parse(release.optString("published_at")).toEpochMilli() > builtAt;
+        } catch (java.time.format.DateTimeParseException e) {
+            return false;
+        }
+    }
+
 }

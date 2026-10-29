@@ -33,6 +33,7 @@ public class WorkspaceUiTest {
             assertEquals(View.VISIBLE, a.findViewById(R.id.source_zip).getVisibility());
             assertEquals(View.VISIBLE, a.findViewById(R.id.source_folder).getVisibility());
             assertEquals(View.GONE, a.findViewById(R.id.acciones).getVisibility());
+            assertEquals(a.findViewById(R.id.source_zip).getHeight(), a.findViewById(R.id.source_folder).getHeight());
         });
         screenshot(ins, "01-inicio");
         ins.runOnMainSync(() -> a.findViewById(R.id.home_start).performClick());
