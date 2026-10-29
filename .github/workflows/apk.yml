@@ -66,7 +66,7 @@ jobs:
         run: |
           # Id de esta versión (código + plantilla): la app lo compara para avisar si hay una nueva
           echo "RPGMK_ID=${GITHUB_SHA::7}-$(sha256sum app/src/main/assets/plantilla.apk | cut -c1-7)" >> $GITHUB_ENV
-          RPGMK_ID=${GITHUB_SHA::7}-$(sha256sum app/src/main/assets/plantilla.apk | cut -c1-7) ./gradlew --no-daemon testDebugUnitTest assembleRelease
+          RPGMK_ID=${GITHUB_SHA::7}-$(sha256sum app/src/main/assets/plantilla.apk | cut -c1-7) ./gradlew --no-daemon testDebugUnitTest assembleRelease assembleDebug assembleDebugAndroidTest
       - name: Verificar firma y estructura del APK
         run: |
           build_tools=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
@@ -90,11 +90,23 @@ jobs:
             adb shell am start -W -n com.zenithuzu.rpgmkport/.MainActivity
             sleep 3
             adb shell pidof com.zenithuzu.rpgmkport || { adb logcat -d -s AndroidRuntime; exit 1; }
+            adb shell settings put secure immersive_mode_confirmations confirmed
+            ./gradlew --no-daemon connectedDebugAndroidTest
+            adb pull /sdcard/Pictures/portemon-ui capturas-android
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: portemon-android-ui
+          path: |
+            capturas-android
+            app/build/reports/androidTests
+            app/build/outputs/androidTest-results
       - name: Publicar
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk RPGMK-Port.apk
+          cp app/build/outputs/apk/release/app-release.apk Portemon.apk
+          cp Portemon.apk RPGMK-Port.apk
           gh release delete ultima --yes --cleanup-tag || true
-          gh release create ultima RPGMK-Port.apk --title "Última versión" \
-            --notes "Compilada de ${GITHUB_SHA::7}. id: ${RPGMK_ID}. Descarga RPGMK-Port.apk desde el teléfono e instálala."
+          gh release create ultima Portemon.apk RPGMK-Port.apk --title "Portémon 0.6" \
+            --notes "Compilada de ${GITHUB_SHA::7}. id: ${RPGMK_ID}. Descarga Portemon.apk desde el teléfono e instálala."

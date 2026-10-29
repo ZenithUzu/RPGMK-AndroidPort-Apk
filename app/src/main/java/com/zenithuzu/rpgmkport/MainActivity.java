@@ -1,6 +1,5 @@
 package com.zenithuzu.rpgmkport;
 
-import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -191,6 +190,8 @@ public class MainActivity extends AppCompatActivity
         mPaso = paso;
         mContenido.removeAllViews();
         mCabecera.setVisibility(paso == 0 ? View.GONE : View.VISIBLE);
+        findViewById(R.id.acciones).setVisibility(paso == 0 ? View.GONE : View.VISIBLE);
+        ((TextView) findViewById(R.id.workspace_title)).setText(paso == 0 ? R.string.workspace_home : R.string.workspace_project);
         dibujarBarras(paso);
         mAyuda.setVisibility(View.GONE);
         mSiguiente.setEnabled(true);
@@ -199,20 +200,8 @@ public class MainActivity extends AppCompatActivity
         switch (paso) {
             case 0:
                 View v = inflar(R.layout.paso_bienvenida);
-                LinearLayout como = v.findViewById(R.id.como);
-                int[] pasos = { R.string.como_1, R.string.como_2, R.string.como_3 };
-                for (int i = 0; i < pasos.length; i++) {
-                    LinearLayout fila = new LinearLayout(this);
-                    fila.setGravity(android.view.Gravity.CENTER_VERTICAL);
-                    fila.setPadding(0, dp(10), 0, 0);
-                    fila.addView(numero(i + 1, false, false), new LinearLayout.LayoutParams(dp(28), dp(28)));
-                    TextView t = new TextView(this, null, 0, R.style.Rpg_Cuerpo);
-                    t.setText(pasos[i]);
-                    t.setPadding(dp(14), 0, 0, 0);
-                    fila.addView(t);
-                    como.addView(fila);
-                }
-                mSiguiente.setText(R.string.empezar);
+                sourceActions(v);
+                v.findViewById(R.id.home_start).setOnClickListener(x -> mostrar(1));
                 break;
             case 1:
                 pasoJuego();
@@ -226,50 +215,40 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    /** Pasos numerados unidos por líneas: hechos con ✓, el actual relleno, los demás con borde. */
+    /** Navegación compacta del proyecto; los pasos futuros se habilitan al avanzar. */
     private void dibujarBarras(int paso)
     {
         mBarras.removeAllViews();
-        int[] nombres = { R.string.paso_juego, R.string.paso_datos, R.string.paso_crear };
+        int[] names = { R.string.paso_juego, R.string.paso_datos, R.string.paso_crear };
         for (int i = 1; i <= PASOS; i++) {
-            if (i > 1) {
-                View linea = new View(this);
-                linea.setBackgroundColor(color(i <= paso ? androidx.appcompat.R.attr.colorPrimary
-                    : com.google.android.material.R.attr.colorOutlineVariant));
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, dp(2), 1);
-                lp.setMargins(dp(6), 0, dp(6), 0);
-                mBarras.addView(linea, lp);
-            }
-            mBarras.addView(numero(i, i < paso, i == paso), new LinearLayout.LayoutParams(dp(26), dp(26)));
+            final int target = i;
+            MaterialButton tab = new MaterialButton(this, null, com.google.android.material.R.attr.materialButtonOutlinedStyle);
+            tab.setText(i + " · " + getString(names[i - 1]));
+            tab.setTextSize(12);
+            tab.setMinWidth(0);
+            tab.setMinimumWidth(0);
+            tab.setPadding(dp(6), 0, dp(6), 0);
+            tab.setCornerRadius(dp(12));
+            tab.setEnabled(!mOcupado && i <= paso);
             if (i == paso) {
-                TextView t = new TextView(this);
-                t.setText(nombres[i - 1]);
-                t.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_LabelLarge);
-                t.setTextColor(color(com.google.android.material.R.attr.colorOnSurface));
-                t.setPadding(dp(8), 0, 0, 0);
-                mBarras.addView(t);
+                tab.setBackgroundTintList(android.content.res.ColorStateList.valueOf(color(com.google.android.material.R.attr.colorPrimaryContainer)));
+                tab.setTextColor(color(com.google.android.material.R.attr.colorOnPrimaryContainer));
             }
+            tab.setOnClickListener(v -> { if (!mOcupado) mostrar(target); });
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, dp(48), 1);
+            lp.setMargins(dp(3), 0, dp(3), 0);
+            mBarras.addView(tab, lp);
         }
     }
 
-    /** Círculo con número (o ✓ si ya se hizo). */
-    private TextView numero(int n, boolean hecho, boolean actual)
+    private void sourceActions(View view)
     {
-        TextView t = new TextView(this);
-        t.setGravity(android.view.Gravity.CENTER);
-        t.setText(hecho ? "✓" : String.valueOf(n));
-        t.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_LabelLarge);
-        GradientDrawable d = new GradientDrawable();
-        d.setShape(GradientDrawable.OVAL);
-        if (hecho || actual) {
-            d.setColor(color(androidx.appcompat.R.attr.colorPrimary));
-            t.setTextColor(color(com.google.android.material.R.attr.colorOnPrimary));
-        } else {
-            d.setColor(color(com.google.android.material.R.attr.colorSecondaryContainer));
-            t.setTextColor(color(com.google.android.material.R.attr.colorOnSecondaryContainer));
-        }
-        t.setBackground(d);
-        return t;
+        view.findViewById(R.id.source_zip).setOnClickListener(v -> {
+            if (!mOcupado) mElegirZip.launch(new String[] { "application/zip", "application/x-zip-compressed", "application/octet-stream" });
+        });
+        view.findViewById(R.id.source_folder).setOnClickListener(v -> {
+            if (!mOcupado) mElegirCarpeta.launch(null);
+        });
     }
 
     private int color(int attr) { return MaterialColors.getColor(mContenido, attr); }
@@ -318,10 +297,9 @@ public class MainActivity extends AppCompatActivity
     private void pasoJuego()
     {
         LinearLayout box = encabezado(R.string.juego_titulo, R.string.juego_texto);
-        opcion(box, R.drawable.ic_zip, getString(R.string.importar_zip), getString(R.string.importar_zip_sub),
-            v -> { if (!mOcupado) mElegirZip.launch(new String[] { "application/zip", "application/x-zip-compressed", "application/octet-stream" }); });
-        opcion(box, R.drawable.ic_carpeta, getString(R.string.elegir_carpeta), getString(R.string.elegir_carpeta_sub),
-            v -> { if (!mOcupado) mElegirCarpeta.launch(null); });
+        View sources = LayoutInflater.from(this).inflate(R.layout.opciones_origen, box, false);
+        box.addView(sources);
+        sourceActions(sources);
 
         mBarra = new LinearProgressIndicator(this);
         mBarra.setIndeterminate(true);
@@ -656,7 +634,7 @@ public class MainActivity extends AppCompatActivity
         mostrar(3);
         new Thread(() -> {
             String fallo = null;
-            StringBuilder registro = new StringBuilder("RPGMK-AndroidPort " + BuildConfig.ID + "\nJuego: "
+            StringBuilder registro = new StringBuilder("Portémon " + BuildConfig.ID + "\nJuego: "
                 + mInfo.titulo + " " + mInfo.version + "\nAPK universal: " + mUniversal + "\n");
             File apk = new File(getCacheDir(), Juego.slug(mInfo.titulo, "juego") + ".apk");
             try {

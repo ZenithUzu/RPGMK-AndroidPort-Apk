@@ -14,7 +14,7 @@ import java.net.URL;
 final class Novedades
 {
     private static final String API = "https://api.github.com/repos/ZenithUzu/RPGMK-AndroidPort-Apk/releases/tags/ultima";
-    private static final String BAJAR = "https://github.com/ZenithUzu/RPGMK-AndroidPort-Apk/releases/download/ultima/RPGMK-Port.apk";
+    private static final String BAJAR = "https://github.com/ZenithUzu/RPGMK-AndroidPort-Apk/releases/download/ultima/Portemon.apk";
 
     static void revisar(Activity a)
     {

@@ -10,8 +10,9 @@ android {
         applicationId 'com.zenithuzu.rpgmkport'
         minSdk 26
         targetSdk 34
-        versionCode 5
-        versionName '0.5'
+        versionCode 6
+        versionName '0.6'
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         buildConfigField 'String', 'ID', "\"${System.getenv('RPGMK_ID') ?: 'local'}\""
     }
 
@@ -50,6 +51,8 @@ android {
 }
 
 dependencies {
+    androidTestImplementation 'androidx.test:runner:1.6.2'
+    androidTestImplementation 'junit:junit:4.13.2'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.json:json:20240303'
     implementation 'com.google.android.material:material:1.12.0'

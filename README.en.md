@@ -1,10 +1,10 @@
 [Español](README.md) | **English**
 
-# RPGMK-AndroidPort
+# Portémon · Android
 
 Build an APK for an **RPG Maker XP, VX or VX Ace game directly on your phone**, with its own name, icon and application ID. This also targets fangames made with Pokémon Essentials.
 
-It uses **mkxp-z** and the shared template from [RMXP-Android-Ports](https://github.com/ZenithUzu/RMXP-Android-Ports), the companion Windows tool. The generated APK runs the game without a separate player app or emulating Windows.
+It uses **mkxp-z** and the shared template from [Portémon PC](https://github.com/ZenithUzu/RMXP-Android-Ports), the companion Windows tool. The generated APK runs the game without a separate player app or emulating Windows.
 
 **[Download](https://github.com/ZenithUzu/RPGMK-AndroidPort-Apk/releases/tag/ultima) · [Quick start](#quick-start) · [Report an issue](#diagnostics-and-support) · [Credits](#credits) · [License](#license)**
 
@@ -24,6 +24,10 @@ AI can make mistakes. Its involvement does not guarantee correct, secure code or
 
 These tools did not author the third-party engines or libraries. Mentioning them does not imply affiliation, sponsorship or endorsement by OpenAI or Anthropic.
 
+## Version 0.6 · Portémon
+
+New identity and workspace: direct ZIP/folder access, compact project navigation and Android dynamic colors. Keeps the application ID, app signing key and game signing keys, so it updates RPGMK Port in place. The former `RPGMK-Port.apk` download remains available for compatibility. Existing build-file and copy handling is unchanged.
+
 ## Version 0.5
 
 Includes the shared template with manually opened controller settings, optional small key labels in both editor and game, and an editor toolbar draggable from ⠿. Adds `RMXP PANTALLA` brightness and transition logs to investigate dark screens; this issue remains under investigation. Rebuild an installed game and update it using the same application ID and signing key to apply these changes.
@@ -39,7 +43,7 @@ No PC, Android Studio or on-device engine compilation is required.
 
 ## Quick start
 
-1. Download **RPGMK-Port.apk** from [Releases](https://github.com/ZenithUzu/RPGMK-AndroidPort-Apk/releases/tag/ultima), install it and tap **Empezar** (Get started).
+1. Download **Portemon.apk** from [Releases](https://github.com/ZenithUzu/RPGMK-AndroidPort-Apk/releases/tag/ultima), install it and tap **Empezar** (Get started).
 2. Choose the game ZIP or folder. The original is not modified. Review warnings about DLLs, WMV videos and Windows calls such as `Win32API`.
 3. Check the **name, author, version and icon**. For MIDI music, select an **external SoundFont (.sf2)** if needed; its header is validated.
 4. Check the **signing key**. For a game already built on PC, import `juego.json` and `firma.jks` from that game's profile folder. For a new game, export and back up the generated key.
@@ -115,7 +119,7 @@ The builder uses `app/firma-app.jks`, a **publicly included test key** to preser
 
 - [ARSCLib](https://github.com/REAndroid/ARSCLib) (Apache-2.0) and [apksig](https://android.googlesource.com/platform/tools/apksig) (Apache-2.0): editing and signing the APK on the phone.
 
-- [RMXP-Android-Ports](https://github.com/ZenithUzu/RMXP-Android-Ports): engine, controls,
+- [Portémon PC](https://github.com/ZenithUzu/RMXP-Android-Ports): engine, controls,
   menu and patches shipped with each game.
 - [mkxp-z](https://github.com/mkxp-z/mkxp-z) and the projects it builds on (see
   RMXP-Android-Ports' credits).

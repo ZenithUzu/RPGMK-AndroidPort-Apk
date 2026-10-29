@@ -1,10 +1,10 @@
 **Español** | [English](README.en.md)
 
-# RPGMK-AndroidPort
+# Portémon · Android
 
 Crea un APK de un juego de **RPG Maker XP, VX o VX Ace desde el teléfono**, con su propio nombre, icono e identificador. Está orientado también a fangames hechos con Pokémon Essentials.
 
-Usa el motor **mkxp-z** y la plantilla compartida de [RMXP-Android-Ports](https://github.com/ZenithUzu/RMXP-Android-Ports), la herramienta compañera para Windows. El APK generado ejecuta el juego sin necesitar una app reproductora aparte ni emular Windows.
+Usa el motor **mkxp-z** y la plantilla compartida de [Portémon PC](https://github.com/ZenithUzu/RMXP-Android-Ports), la herramienta compañera para Windows. El APK generado ejecuta el juego sin necesitar una app reproductora aparte ni emular Windows.
 
 **[Descargar la app](https://github.com/ZenithUzu/RPGMK-AndroidPort-Apk/releases/tag/ultima) · [Inicio rápido](#inicio-rápido) · [Reportar un problema](#diagnóstico-y-soporte) · [Créditos](#créditos) · [Licencia](#licencia)**
 
@@ -24,6 +24,10 @@ La IA puede equivocarse: su participación no garantiza que el código sea corre
 
 Estas herramientas no son autoras de los motores ni de las bibliotecas de terceros. Su mención tampoco implica afiliación, patrocinio o respaldo de OpenAI o Anthropic.
 
+## Versión 0.6 · Portémon
+
+Nueva identidad e interfaz: inicio con acceso directo a ZIP o carpeta, navegación compacta del proyecto y colores dinámicos de Android. Mantiene el identificador de la app, su firma y las firmas de los juegos, por lo que se instala como actualización de RPGMK Port. El enlace anterior `RPGMK-Port.apk` sigue disponible por compatibilidad. Los archivos y copias del flujo de creación mantienen su funcionamiento actual.
+
 ## Versión 0.5
 
 Incluye la plantilla compartida con apertura manual de «Mando y teclado», letras pequeñas configurables en editor y juego, y barra del editor movible desde ⠿. Añade registros `RMXP PANTALLA` de brillo y transiciones para investigar el oscurecimiento de algunos juegos; ese fallo sigue en diagnóstico. Para aplicar los cambios a un juego instalado, vuelve a crear su APK y actualízalo conservando su identificador y firma.
@@ -39,7 +43,7 @@ No necesitas PC, Android Studio ni compilar el motor en el teléfono.
 
 ## Inicio rápido
 
-1. Descarga **RPGMK-Port.apk** desde [Releases](https://github.com/ZenithUzu/RPGMK-AndroidPort-Apk/releases/tag/ultima), instálalo y abre **Empezar**.
+1. Descarga **Portemon.apk** desde [Releases](https://github.com/ZenithUzu/RPGMK-AndroidPort-Apk/releases/tag/ultima), instálalo y abre **Empezar**.
 2. Elige el ZIP o la carpeta del juego. El original no se modifica. Revisa los avisos sobre DLL, videos WMV y llamadas de Windows como `Win32API`.
 3. Comprueba **nombre, autor, versión e icono**. Si necesitas música MIDI, selecciona un **SoundFont externo (.sf2)**; el selector comprueba su cabecera.
 4. Revisa la **firma**. Si ya creaste ese juego en PC, importa `juego.json` y `firma.jks` desde la carpeta del perfil del juego. Si es nuevo, exporta y respalda la firma generada.
@@ -115,7 +119,7 @@ El constructor utiliza `app/firma-app.jks`, una **llave de prueba incluida públ
 
 - [ARSCLib](https://github.com/REAndroid/ARSCLib) (Apache-2.0) y [apksig](https://android.googlesource.com/platform/tools/apksig) (Apache-2.0): editar y firmar el APK en el teléfono.
 
-- [RMXP-Android-Ports](https://github.com/ZenithUzu/RMXP-Android-Ports): motor, controles,
+- [Portémon PC](https://github.com/ZenithUzu/RMXP-Android-Ports): motor, controles,
   menú y parches que lleva cada juego.
 - [mkxp-z](https://github.com/mkxp-z/mkxp-z) y los proyectos en los que se apoya (ver los
   créditos de RMXP-Android-Ports).

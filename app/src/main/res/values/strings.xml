@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">RPGMK Port</string>
+    <string name="app_name">Portémon</string>
     <string name="empezar">Empezar</string>
     <string name="continuar">Continuar</string>
     <string name="atras">Atrás</string>
 
-    <string name="juego_titulo">Elige el juego</string>
-    <string name="juego_texto">Necesitas los archivos del juego para PC: la carpeta que trae Game.ini, o el .zip tal como lo descargaste. Se lee directo, sin copiarlo; el original no se toca.</string>
+    <string name="juego_titulo">Archivos de origen</string>
+    <string name="juego_texto">Abre el ZIP o la carpeta que contiene Game.ini. El original se conserva.</string>
     <string name="importar_zip">Importar un .zip</string>
     <string name="importar_zip_sub">El archivo tal como lo descargaste</string>
     <string name="elegir_carpeta">Elegir una carpeta</string>
@@ -52,12 +52,12 @@
     <string name="permiso_instalar">Android pide permitir que esta app instale apps. Actívalo, vuelve y presiona Crear otra vez.</string>
     <string name="guardar_apk">Guardar el APK</string>
     <string name="apk_guardado">APK guardado</string>
-    <string name="lema">Tus fangames de RPG Maker XP, VX y VX Ace, convertidos en apps de Android desde el mismo teléfono. Sin PC y sin otra app de por medio.</string>
+    <string name="lema">Convierte juegos de RPG Maker XP, VX y VX Ace en un APK con su nombre, icono y firma.</string>
     <string name="como_funciona">Así funciona</string>
     <string name="como_1">Elige el juego: el .zip o su carpeta</string>
     <string name="como_2">Revisa nombre, autor, icono y firma</string>
     <string name="como_3">Crea la app e instálala</string>
-    <string name="nota_motor">Usa el motor mkxp-z de RMXP-Android-Ports, el mismo de la herramienta para PC. En pruebas: si algo falla, cuéntalo en GitHub con el registro del juego.</string>
+    <string name="nota_motor">Proyecto experimental basado en mkxp-z. Comparte motor y controles con Portémon para PC.</string>
     <string name="paso_juego">Juego</string>
     <string name="paso_datos">Datos</string>
     <string name="paso_crear">Crear</string>
@@ -80,4 +80,15 @@
     <string name="editar_datos_sub">Nombre, firma, icono y opciones del juego</string>
     <string name="instalar_apk">Instalar APK creado</string>
     <string name="apk_creado">APK creado. Puedes instalarlo o guardarlo.</string>
+    <string name="workspace_home">ESTUDIO DE PORTS</string>
+    <string name="workspace_project">PROYECTO ANDROID</string>
+    <string name="home_title">De tu juego a una app.</string>
+    <string name="home_hint">Empieza con los archivos del juego. Tú eliges el nombre, el icono y la firma.</string>
+    <string name="home_start">Configurar un proyecto</string>
+    <string name="home_detail_title">Una firma que puedes conservar</string>
+    <string name="home_detail">Importa o exporta la firma desde Datos para continuar el mismo proyecto en PC y Android.</string>
+    <string name="source_zip_title">Archivo ZIP</string>
+    <string name="source_folder_title">Carpeta</string>
+    <string name="source_zip_hint">Juego comprimido</string>
+    <string name="source_folder_hint">Juego extraído</string>
 </resources>

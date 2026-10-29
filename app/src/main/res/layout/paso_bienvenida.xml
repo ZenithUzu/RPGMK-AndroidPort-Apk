@@ -1,69 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
-
-    <!-- Icono de la app en un cuadro redondeado (color del tema) -->
-    <com.google.android.material.card.MaterialCardView
-        style="@style/Widget.Material3.CardView.Filled"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
-        android:layout_marginTop="16dp"
-        app:cardBackgroundColor="?attr/colorPrimaryContainer"
-        app:cardCornerRadius="22dp">
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
-            android:importantForAccessibility="no"
-            android:src="@drawable/ic_mando"
-            app:tint="?attr/colorOnPrimaryContainer" />
-    </com.google.android.material.card.MaterialCardView>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="@string/app_name"
-        android:textAppearance="?attr/textAppearanceDisplaySmall"
-        android:textColor="?attr/colorOnSurface" />
-    <TextView
-        style="@style/Rpg.Cuerpo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/lema" />
-
-    <!-- Así funciona: los tres pasos -->
-    <com.google.android.material.card.MaterialCardView
-        style="@style/Widget.Material3.CardView.Outlined"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
-        app:cardCornerRadius="20dp">
-        <LinearLayout
-            android:id="@+id/como"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:text="@string/como_funciona"
-                android:textAppearance="?attr/textAppearanceTitleMedium"
-                android:textColor="?attr/colorOnSurface" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp"
+        android:text="@string/home_title" android:textAppearance="?attr/textAppearanceDisplaySmall" android:textStyle="bold" android:textColor="?attr/colorOnSurface" />
+    <TextView style="@style/Rpg.Cuerpo" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="12dp" android:text="@string/home_hint" />
+    <include layout="@layout/opciones_origen" />
+    <com.google.android.material.button.MaterialButton android:id="@+id/home_start" style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="end"
+        android:text="@string/home_start" app:icon="@drawable/ic_chevron" app:iconGravity="textEnd" />
+    <com.google.android.material.card.MaterialCardView style="@style/Widget.Material3.CardView.Outlined"
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp" app:cardCornerRadius="16dp">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="20dp" android:orientation="vertical">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/home_detail_title"
+                android:textAppearance="?attr/textAppearanceTitleMedium" android:textColor="?attr/colorOnSurface" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp"
+                android:text="@string/home_detail" android:textAppearance="?attr/textAppearanceBodyMedium" android:textColor="?attr/colorOnSurfaceVariant" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="@string/nota_motor"
-        android:textAppearance="?attr/textAppearanceBodySmall"
-        android:textColor="?attr/colorOnSurfaceVariant" />
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp"
+        android:text="@string/nota_motor" android:textAppearance="?attr/textAppearanceBodySmall" android:textColor="?attr/colorOnSurfaceVariant" />
 </LinearLayout>
