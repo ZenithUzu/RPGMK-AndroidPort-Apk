@@ -33,8 +33,8 @@
     <string name="ahorrar_sub">Las imágenes y la música se leen del APK en vez de copiarse</string>
 
     <string name="crear_titulo">Crear la app</string>
-    <string name="crear_texto">Se arma el APK con el motor ya listo, se firma a nombre del autor y se instala.</string>
-    <string name="crear">Crear e instalar</string>
+    <string name="crear_texto">Primero se crea y firma el APK. Después puedes guardarlo o instalarlo sin volver a crearlo.</string>
+    <string name="crear">Crear APK</string>
     <string name="firma_titulo">Firma</string>
     <string name="firma_nueva">Se creará una nueva, a nombre de %1$s</string>
     <string name="firma_guardada">Guardada en el teléfono · %1$s</string>
@@ -47,7 +47,7 @@
     <string name="firma_exportada">Firma guardada</string>
     <string name="instalando">Instalando…</string>
     <string name="instalado">¡Listo! Ya puedes abrir el juego desde tus apps.</string>
-    <string name="conflicto">Ya tienes este juego instalado con otra firma. Importa la firma con la que lo hiciste (la de la PC) y vuelve a crearlo. Si no la tienes, desinstala el juego: tus partidas quedan en la carpeta RPG Maker si la activaste.</string>
+    <string name="conflicto">La firma no coincide con la del juego instalado. Importa su firma desde Datos → Firma y vuelve a crear el APK. No necesitas desinstalar el juego.</string>
     <string name="fallo_instalar">No se instaló: %1$s</string>
     <string name="permiso_instalar">Android pide permitir que esta app instale apps. Actívalo, vuelve y presiona Crear otra vez.</string>
     <string name="guardar_apk">Guardar el APK</string>
@@ -74,4 +74,10 @@
     <string name="guardar_log">Guardar registro de creación</string>
     <string name="guardar_log_sub">Pasos y errores del constructor. El log del juego se exporta desde el menú del juego.</string>
     <string name="log_guardado">Registro guardado</string>
+    <string name="crear_otra">Crear otra app</string>
+    <string name="crear_otra_sub">Elegir otro juego y conservar el APK guardado</string>
+    <string name="editar_datos">Cambiar datos y volver a crear</string>
+    <string name="editar_datos_sub">Nombre, firma, icono y opciones del juego</string>
+    <string name="instalar_apk">Instalar APK creado</string>
+    <string name="apk_creado">APK creado. Puedes instalarlo o guardarlo.</string>
 </resources>

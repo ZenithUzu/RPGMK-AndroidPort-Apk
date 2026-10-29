@@ -87,3 +87,8 @@ different key, each author's.
 [GPL-2.0-or-later](LICENSE). Games are not included in or covered by this license:
 porting a fangame needs its author's permission, and Pokémon fangames use property of
 Nintendo, The Pokémon Company and Game Freak.
+
+In **0.3**, Build APK and Install built APK are separate actions. Installing again
+reuses the completed file. The shared runtime includes sidebar control settings,
+a visible pause switch, non-overlapping keyboard and explicit 60/120 FPS targets.
+Targets do not guarantee measured performance.

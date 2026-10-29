@@ -27,8 +27,8 @@ no hay Windows emulado.
    `juego.json` y `firma.jks` de `RMXP-Android-Ports\juegos\<juego>`. Así el APK nuevo se
    instala **encima** del de la PC sin perder partidas. Si no, se crea una firma nueva a
    nombre del autor; respáldala con **Exportar firma**.
-6. **Crear e instalar**: arma el APK, lo firma y Android te pregunta si lo instalas. También
-   puedes **Guardar el APK** para pasarlo a otro teléfono.
+6. **Crear APK**: arma y firma el archivo. Después puedes **Instalar APK creado**
+   sin repetir la creación, **Guardar el APK** o **Crear otra app**.
 
 La app usa los colores de tu fondo de pantalla (Material You, Android 12 o más nuevo) y
 te avisa cuando hay una versión nueva (de la app o del motor).
@@ -109,3 +109,8 @@ con otra llave, la de cada autor.
 [GPL-2.0-or-later](LICENSE). Los juegos no están incluidos ni cubiertos por esta licencia:
 portar un fangame necesita el permiso de su autor, y los fangames de Pokémon usan propiedad
 de Nintendo, The Pokémon Company y Game Freak.
+
+En **0.3** crear e instalar son acciones independientes. La plantilla incorpora el
+editor y asignación de mando en paneles laterales, pausa visible, teclado sin
+superposición y objetivos explícitos de 60/120 FPS. El objetivo no garantiza los FPS
+medidos. Ver la [auditoría de interfaz](https://github.com/ZenithUzu/RMXP-Android-Ports/blob/main/docs/auditoria-interfaz.md).

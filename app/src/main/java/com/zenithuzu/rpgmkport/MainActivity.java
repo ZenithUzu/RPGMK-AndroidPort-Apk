@@ -172,8 +172,8 @@ public class MainActivity extends AppCompatActivity
     {
         if (mOcupado) return;
         if (mPaso == 3) {
-            if (!mOcupado)
-                crear();
+            if (mApk != null && mApk.isFile()) instalar(mApk);
+            else crear();
             return;
         }
         if (mPaso == 2)
@@ -218,6 +218,7 @@ public class MainActivity extends AppCompatActivity
                 pasoJuego();
                 break;
             case 2:
+                mApk = null;
                 pasoDatos();
                 break;
             default:
@@ -630,7 +631,17 @@ public class MainActivity extends AppCompatActivity
         if (!mOcupado && new File(getFilesDir(), "constructor.log").isFile())
             opcion(box, R.drawable.ic_zip, getString(R.string.guardar_log), getString(R.string.guardar_log_sub),
                 x -> mGuardarLog.launch("rpgmk-constructor-log.txt"));
-        mSiguiente.setText(R.string.crear);
+        boolean listo = mApk != null && mApk.isFile();
+        if (listo && !mOcupado) {
+            opcion(box, R.drawable.ic_zip, getString(R.string.crear_otra), getString(R.string.crear_otra_sub), x -> {
+                cerrarJuego(); mInfo = null; mApk = null; mJuegoUri = null;
+                mIcono = null; mSoundfont = null; mostrar(1);
+            });
+            opcion(box, R.drawable.ic_zip, getString(R.string.editar_datos), getString(R.string.editar_datos_sub), x -> {
+                mApk = null; mostrar(2);
+            });
+        }
+        mSiguiente.setText(listo ? R.string.instalar_apk : R.string.crear);
         mSiguiente.setEnabled(!mOcupado);
     }
 
@@ -638,13 +649,8 @@ public class MainActivity extends AppCompatActivity
     private void crear()
     {
         if (mJuego == null || mInfo == null || mOcupado) return;
-        if (!getPackageManager().canRequestPackageInstalls()) {
-            aviso(getString(R.string.permiso_instalar));
-            startActivity(new android.content.Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
-                Uri.parse("package:" + getPackageName())));
-            return;
-        }
         mOcupado = true;
+        mApk = null;
         mOrientacion = getRequestedOrientation();
         setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         mostrar(3);
@@ -722,7 +728,7 @@ public class MainActivity extends AppCompatActivity
                 if (error != null)
                     mProgreso.setText(error);
                 else
-                    instalar(apk);
+                    mProgreso.setText(R.string.apk_creado);
                 setRequestedOrientation(mOrientacion);
             });
         }).start();
@@ -768,6 +774,12 @@ public class MainActivity extends AppCompatActivity
 
     private void instalar(File apk)
     {
+        if (!getPackageManager().canRequestPackageInstalls()) {
+            aviso(getString(R.string.permiso_instalar));
+            startActivity(new android.content.Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                Uri.parse("package:" + getPackageName())));
+            return;
+        }
         mProgreso.setText(R.string.instalando);
         try {
             android.content.pm.PackageInstaller pi = getPackageManager().getPackageInstaller();

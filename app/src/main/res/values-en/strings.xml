@@ -27,8 +27,8 @@
     <string name="ahorrar_sub">Pictures and music are read from the APK instead of being copied</string>
 
     <string name="crear_titulo">Create the app</string>
-    <string name="crear_texto">The APK is put together with the ready-made engine, signed in the author\'s name and installed.</string>
-    <string name="crear">Create and install</string>
+    <string name="crear_texto">First build and sign the APK. Then save or install it without rebuilding.</string>
+    <string name="crear">Create APK</string>
     <string name="firma_titulo">Signature</string>
     <string name="firma_nueva">A new one will be created in %1$s\'s name</string>
     <string name="firma_guardada">Saved on the phone · %1$s</string>
@@ -41,7 +41,7 @@
     <string name="firma_exportada">Signature saved</string>
     <string name="instalando">Installing…</string>
     <string name="instalado">Done! You can open the game from your apps.</string>
-    <string name="conflicto">This game is already installed with a different signature. Import the signature you made it with (the PC one) and create it again. If you don\'t have it, uninstall the game: your saves stay in the RPG Maker folder if you turned it on.</string>
+    <string name="conflicto">The signing key differs from the installed game. Import its key from Details → Signing key and rebuild. You do not need to uninstall the game.</string>
     <string name="fallo_instalar">Not installed: %1$s</string>
     <string name="permiso_instalar">Android asks you to allow this app to install apps. Turn it on, come back and tap Create again.</string>
     <string name="guardar_apk">Save the APK</string>
@@ -68,4 +68,10 @@
     <string name="guardar_log">Save build log</string>
     <string name="guardar_log_sub">Builder steps and errors. Export the game log from the game menu.</string>
     <string name="log_guardado">Log saved</string>
+    <string name="crear_otra">Create another app</string>
+    <string name="crear_otra_sub">Choose another game; exported APKs are kept</string>
+    <string name="editar_datos">Edit details and rebuild</string>
+    <string name="editar_datos_sub">Game name, signing key, icon and options</string>
+    <string name="instalar_apk">Install built APK</string>
+    <string name="apk_creado">APK built. You can install or save it.</string>
 </resources>
