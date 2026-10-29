@@ -30,7 +30,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p app/src/main/assets
-          curl -fsSL https://raw.githubusercontent.com/ZenithUzu/RMXP-Android-Ports/main/tools/rmxp_port.py -o /tmp/rmxp_port.py
+          pcsha=$(gh api repos/ZenithUzu/RMXP-Android-Ports/commits/main --jq .sha)
+          curl -fsSL "https://raw.githubusercontent.com/ZenithUzu/RMXP-Android-Ports/$pcsha/tools/rmxp_port.py" -o /tmp/rmxp_port.py
           motor=$(python3 - <<'PY'
           import ast
           tree = ast.parse(open('/tmp/rmxp_port.py', encoding='utf-8').read())
@@ -40,10 +41,19 @@ jobs:
           )
           # Esperar la plantilla del mismo motor; no publicar una app con una plantilla vieja.
           lista=false
-          for intento in $(seq 1 60); do
+          for intento in $(seq 1 180); do
             notas=$(gh api repos/ZenithUzu/RMXP-Android-Ports/releases/tags/plantilla-ultima --jq .body 2>/dev/null || true)
-            if [[ "$notas" == *"Motor $motor "* ]]; then lista=true; break; fi
-            echo "Esperando plantilla de $motor ($intento/60)..."
+            if [[ "$notas" == *"Motor $motor "* && "$notas" =~ Hecho\ de\ ([[:xdigit:]]{7,40}) ]]; then
+              plantilla_sha=${BASH_REMATCH[1]}
+              # El mismo motor no garantiza el mismo menú, recursos o parches.
+              if gh api "repos/ZenithUzu/RMXP-Android-Ports/compare/$plantilla_sha...$pcsha" |
+                jq -e '(.status == "ahead" or .status == "identical") and
+                  (.files | length < 300) and
+                  all(.files[]; (.filename | test("^(android/app/src/|android/app/build.gradle$|android/patches/|android/app/jni/|android/tools/)")) | not)' >/dev/null; then
+                lista=true; break
+              fi
+            fi
+            echo "Esperando plantilla de $motor ($intento/180)..."
             sleep 10
           done
           if [[ "$lista" != true ]]; then echo "La plantilla del motor actual todavia no esta lista"; exit 1; fi
