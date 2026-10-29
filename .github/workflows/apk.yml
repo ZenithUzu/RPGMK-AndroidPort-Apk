@@ -47,9 +47,10 @@ jobs:
               plantilla_sha=${BASH_REMATCH[1]}
               # El mismo motor no garantiza el mismo menú, recursos o parches.
               if gh api "repos/ZenithUzu/RMXP-Android-Ports/compare/$plantilla_sha...$pcsha" |
-                jq -e '(.status == "ahead" or .status == "identical") and
+                jq -e '(.status == "behind") or
+                  ((.status == "ahead" or .status == "identical") and
                   (.files | length < 300) and
-                  all(.files[]; (.filename | test("^(android/app/src/|android/app/build.gradle$|android/patches/|android/app/jni/|android/tools/)")) | not)' >/dev/null; then
+                  all(.files[]; (.filename | test("^(android/app/src/|android/app/build.gradle$|android/patches/|android/app/jni/|android/tools/)")) | not))' >/dev/null; then
                 lista=true; break
               fi
             fi
