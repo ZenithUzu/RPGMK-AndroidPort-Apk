@@ -144,3 +144,5 @@ The shared template includes side panels for button, label/symbol and key-badge 
 ### Portémon 0.8
 
 The shared template adds RGSS Linker/FmodEx bootstrap compatibility, a flat-map H-mode7 fallback and searchable physical key/button/axis mappings with app actions. Existing profiles and dynamic colors are retained. See [Insurgence compatibility scope](https://github.com/ZenithUzu/portemon-pc/blob/main/docs/compatibilidad-insurgence.md); the complete game and all forks have not been verified. Rebuild game APKs using their original signing key to update the runtime.
+
+Opening the menu releases held physical keys; keyboard and controller ownership of the same game key is tracked independently.
