@@ -25,6 +25,8 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+      - name: Comprobar sincronización de la plantilla
+        run: python3 -m unittest discover -s tests -v
       - name: Bajar la plantilla (motor sin juego) de RMXP-Android-Ports
         env:
           GH_TOKEN: ${{ github.token }}
