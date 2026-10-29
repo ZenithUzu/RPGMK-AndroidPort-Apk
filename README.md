@@ -2,97 +2,110 @@
 
 # RPGMK-AndroidPort
 
-Convierte un fangame de **RPG Maker XP, VX o VX Ace** (por ejemplo, uno hecho con
-Pokémon Essentials) en una **app de Android propia, desde el mismo teléfono**. No hace
-falta PC, JoiPlay ni Kirin: cada juego queda como una app con su nombre, su icono y la
-firma de su autor.
+Crea un APK de un juego de **RPG Maker XP, VX o VX Ace desde el teléfono**, con su propio nombre, icono e identificador. Está orientado también a fangames hechos con Pokémon Essentials.
 
-Es la versión para teléfono de [RMXP-Android-Ports](https://github.com/ZenithUzu/RMXP-Android-Ports)
-(la herramienta para Windows) y usa su mismo motor, **mkxp-z**: el juego corre de verdad,
-no hay Windows emulado.
+Usa el motor **mkxp-z** y la plantilla compartida de [RMXP-Android-Ports](https://github.com/ZenithUzu/RMXP-Android-Ports), la herramienta compañera para Windows. El APK generado ejecuta el juego sin necesitar una app reproductora aparte ni emular Windows.
 
-> **Estado: en pruebas.** Ya arma, firma e instala el APK. Falta probarlo en más teléfonos y juegos.
+**[Descargar la app](https://github.com/ZenithUzu/RPGMK-AndroidPort-Apk/releases/tag/ultima) · [Inicio rápido](#inicio-rápido) · [Reportar un problema](#diagnóstico-y-soporte) · [Créditos](#créditos) · [Licencia](#licencia)**
 
-La versión **0.4** incorpora el motor **v13**: pausa también la música, corrige tamaño y opacidad del editor y el limitador de FPS, y añade perfiles Xbox/Switch con cruceta, ambos sticks y gatillos en el panel lateral. Para recibirlo en un juego, vuelve a crear su APK y actualiza con la misma firma. [Pruebas y asignaciones](https://github.com/ZenithUzu/RMXP-Android-Ports/blob/main/docs/pruebas-ports.md#motor-v13-pausa-personalización-y-mandos).
+> **Estado: experimental y en pruebas.** Crear, firmar e instalar un APK no garantiza compatibilidad con todos los juegos. El rendimiento y las funciones disponibles dependen del juego y del teléfono.
 
-## Cómo se usa
+## Sobre el proyecto
 
-1. Descarga **RPGMK-Port.apk** de la [última versión](https://github.com/ZenithUzu/RPGMK-AndroidPort-Apk/releases/tag/ultima) e instálala.
-2. Abre la app y presiona **Empezar**.
-3. **Elige el juego**: el `.zip` tal como lo descargaste, o la carpeta que tiene `Game.ini`.
-   Se lee directo, sin copiarlo ni descomprimirlo (el original no se toca). Verás cuántos
-   archivos tiene y una **revisión de compatibilidad**: avisa si usa `.dll`, videos `.wmv`
-   o funciones de Windows (`Win32API`).
-4. **Revisa los datos**: nombre, autor (va en la firma), versión e icono. Salen del
-   `Game.ini` y del Léeme del juego.
-5. **Firma**: si el juego ya lo hiciste en la PC, usa **Importar firma de la PC** y elige
-   `juego.json` y `firma.jks` de `RMXP-Android-Ports\juegos\<juego>`. Así el APK nuevo se
-   instala **encima** del de la PC sin perder partidas. Si no, se crea una firma nueva a
-   nombre del autor; respáldala con **Exportar firma**.
-6. **Crear APK**: arma y firma el archivo. Después puedes **Instalar APK creado**
-   sin repetir la creación, **Guardar el APK** o **Crear otra app**.
+Proyecto personal de **ZenithUzu**, desarrollado **por pasatiempo y sin fines de lucro** para aprender, experimentar y facilitar la creación de ports de RPG Maker para Android. Se mantiene en el tiempo libre; las actualizaciones y la atención de errores dependen de esa disponibilidad.
 
-La app usa los colores de tu fondo de pantalla (Material You, Android 12 o más nuevo) y
-te avisa cuando hay una versión nueva (de la app o del motor).
+Se apoya en motores, bibliotecas y aportaciones de la comunidad. Los créditos de esos proyectos se conservan más abajo.
 
-En la revisión **0.2** también puedes elegir un **SoundFont externo (.sf2)** y
-activar **APK universal** para incluir todas las arquitecturas de la plantilla,
-igual que en PC. Sin esa opción, se mantiene el APK pequeño para tu teléfono.
-El selector de SoundFont comprueba la cabecera SF2 antes de incluirlo.
+### Uso de inteligencia artificial
 
-El asistente conserva nombre, autor, versión, icono y opciones al recrearse la
-pantalla. La orientación se mantiene durante la lectura y la creación para no
-duplicar trabajos. El APK anterior solo se reemplaza cuando el nuevo termina
-de firmarse, y se cierran los ZIP que ya no se usan.
+En el desarrollo se han utilizado **ChatGPT (OpenAI)** y **Claude (Anthropic)** como herramientas de apoyo para programar, investigar errores, proponer mejoras, preparar pruebas y redactar documentación.
 
-Si falla la creación, en el último paso aparece **Guardar registro de creación**.
-Ese TXT contiene los pasos y el error del constructor. Para un fallo dentro del
-juego, abre el juego y usa **Atrás → Guardar registro (log)**; el constructor no
-lee el log de otra app. En PC, la captura por USB está en **Log del juego**.
+La IA puede equivocarse: su participación no garantiza que el código sea correcto, seguro ni compatible con todos los juegos. Las decisiones del proyecto y la comprobación de los cambios siguen siendo responsabilidad de quienes lo mantienen. Las pruebas automáticas complementan las pruebas en dispositivos reales; no las sustituyen.
 
-La compilación de esta app espera una plantilla del mismo motor que solicita
-la herramienta de PC y ejecuta las pruebas antes de publicar `ultima`. Debes
-instalar la nueva versión de esta app para recibir esa plantilla; hacer Pull
-del código no actualiza una app ya instalada.
+Estas herramientas no son autoras de los motores ni de las bibliotecas de terceros. Su mención tampoco implica afiliación, patrocinio o respaldo de OpenAI o Anthropic.
 
-Cada juego trae lo mismo que los de la PC: menú de opciones, controles editables,
-perfil de controles, gestor de partidas, vibración, parche `Win32API` para Essentials
-viejos y música MIDI. Ver [RMXP-Android-Ports](https://github.com/ZenithUzu/RMXP-Android-Ports#qué-trae-la-app).
+## Requisitos
 
-## Cómo funciona
+- **Android 8.0 o posterior**. Los colores dinámicos de Material You requieren Android 12 o posterior.
+- Un juego completo en una carpeta con `Game.ini` o en un archivo ZIP.
+- Espacio libre para el APK y sus archivos de trabajo.
+- Permiso para instalar aplicaciones desde esta fuente al instalar el constructor y los juegos.
 
-No se compila nada en el teléfono. Todos los APK de juegos son iguales por dentro (el
-mismo motor ya compilado); solo cambian los archivos del juego, el nombre, el icono, el id
-y la firma. Por eso la app:
+No necesitas PC, Android Studio ni compilar el motor en el teléfono.
 
-1. trae una **plantilla** del APK, compilada por RMXP-Android-Ports;
-2. le mete el juego y le cambia nombre, icono, id y versión;
-3. la **firma** a nombre del autor (una sola vez, firma v2) (con una llave propia por juego, que puedes respaldar);
-4. la **instala**.
+## Inicio rápido
 
-| Parte | Qué hace | Estado |
-|---|---|---|
-| 1 | Interfaz, importar juego (.zip o carpeta), leer datos | Hecha |
-| 2 | Plantilla del APK y armar el APK con el juego | Hecha |
-| 3 | Firma por juego (compatible con la PC), instalar, actualizar | Hecha |
+1. Descarga **RPGMK-Port.apk** desde [Releases](https://github.com/ZenithUzu/RPGMK-AndroidPort-Apk/releases/tag/ultima), instálalo y abre **Empezar**.
+2. Elige el ZIP o la carpeta del juego. El original no se modifica. Revisa los avisos sobre DLL, videos WMV y llamadas de Windows como `Win32API`.
+3. Comprueba **nombre, autor, versión e icono**. Si necesitas música MIDI, selecciona un **SoundFont externo (.sf2)**; el selector comprueba su cabecera.
+4. Revisa la **firma**. Si ya creaste ese juego en PC, importa `juego.json` y `firma.jks` desde la carpeta del perfil del juego. Si es nuevo, exporta y respalda la firma generada.
+5. Pulsa **Crear APK**. Al terminar, puedes **Instalar APK creado**, **Guardar el APK** o **Crear otra app**. Instalar el archivo terminado no repite su creación.
+
+**APK universal** incluye todas las arquitecturas disponibles en la plantilla. Sin esa opción, se genera un APK adaptado al teléfono para reducir su tamaño.
+
+## Funciones
+
+| Apartado | Qué ofrece |
+|---|---|
+| Constructor | Asistente por pasos, ZIP o carpeta, revisión de compatibilidad, nombre, icono y versión. |
+| Interfaz | Diseño Material con colores dinámicos en Android compatible y recuperación de los datos del asistente al recrear la pantalla. |
+| Firma | Llave por juego, exportación e importación compatible con los perfiles de PC. |
+| Instalación | Creación e instalación separadas; el APK anterior se reemplaza al terminar de firmar el nuevo. |
+| Motor compartido | Menú lateral, editor de controles, teclado en pantalla y perfiles Xbox/Switch con cruceta, sticks y gatillos. |
+| Opciones del juego | Pausa configurable de juego y música en menú/editor, personalización táctil, vibración y objetivos de FPS, incluidos 60/120. |
+| Partidas y audio | Gestor de partidas, perfiles de controles y MIDI mediante FluidSynth y un SoundFont. |
+| Diagnóstico | Registro de creación exportable; el juego generado permite exportar su propio log. |
+
+Los objetivos de FPS no garantizan el rendimiento real. Consulta las [funciones del motor](https://github.com/ZenithUzu/RMXP-Android-Ports#qué-trae-la-app) y la [comparación entre PC y Android](https://github.com/ZenithUzu/RMXP-Android-Ports/blob/main/docs/paridad-pc-android.md).
+
+## Actualizar sin perder firmas y partidas
+
+Actualizar el **constructor** no cambia el motor ni la interfaz de los **juegos ya instalados**. Para aplicar esos cambios:
+
+1. Instala la versión nueva del constructor.
+2. Vuelve a crear el APK desde el juego completo.
+3. Conserva el mismo identificador y la misma llave de firma e instálalo como actualización.
+
+Respalda tus partidas y exporta las firmas antes de probar. Desinstalar un juego puede borrar sus datos internos.
+
+El certificado puede contener el nombre del autor, pero la llave la genera la herramienta: **no es la llave privada del creador ni acredita un port oficial**. Una firma diferente impide actualizar el APK existente.
+
+## Diagnóstico y soporte
+
+- **Fallo al crear el APK:** usa **Guardar registro de creación** en el último paso.
+- **Fallo dentro del juego:** abre el juego generado y usa **Atrás → Guardar registro (log)**. El constructor no puede leer el registro privado de otra app.
+- **Captura por USB:** utiliza **Log del juego** en la herramienta de PC.
+- **MIDI sin sonido:** comprueba que el juego incluya un SoundFont o selecciona un archivo `.sf2` antes de crear el APK.
+
+Abre un [issue](https://github.com/ZenithUzu/RPGMK-AndroidPort-Apk/issues) con la versión del constructor y del motor, juego y versión, teléfono, Android, pasos para reproducir el fallo y registro. Para problemas de FPS, indica objetivo, Hz actuales, zona y estado del turbo.
+
+Revisa los adjuntos para retirar datos personales. No publiques firmas privadas, contraseñas ni juegos completos.
+
+Las [pruebas recomendadas](https://github.com/ZenithUzu/RMXP-Android-Ports/blob/main/docs/pruebas-ports.md) cubren instalación, actualización, partidas, menú y controles. Las pruebas de interfaz con motor simulado no miden FPS reales ni confirman la vibración física.
+
+## Cómo funciona y cómo se sincroniza con PC
+
+La app incluye una **plantilla de APK con el motor ya compilado**. Inserta los archivos del juego, modifica sus datos y firma el resultado con una llave por juego.
+
+El motor, el menú y los controles se mantienen en RMXP-Android-Ports. La compilación de este constructor espera la plantilla correspondiente al motor solicitado por PC y ejecuta sus comprobaciones antes de publicar `ultima`. Las dos herramientas comparten esa base; sus flujos de construcción e instalación son distintos.
 
 ## Para desarrolladores
 
-```
-app/src/main/java/com/zenithuzu/rpgmkport/
-  MainActivity.java   asistente por pasos
-  Origen.java         leer el juego desde una carpeta o el .zip, sin copiarlo
-  Juego.java          abrir el juego, leer nombre, autor y versión, y revisar compatibilidad
-  Novedades.java      aviso de versión nueva (release "ultima")
-  Constructor.java    armar el APK desde la plantilla (ARSCLib) y firmarlo (apksig)
-  Firma.java          firma por juego, mismo formato que la PC (firma.jks + juego.json)
-.github/workflows/apk.yml   compila y publica la versión "ultima"
+Requiere **Java 17** y el **SDK de Android**:
+
+```sh
+./gradlew assembleDebug
 ```
 
-Compilar: `./gradlew assembleDebug` (Java 17 y el SDK de Android).
-La app se firma con `app/firma-app.jks` (llave pública de prueba, guardada en el repo a
-propósito para que cada versión nueva se instale encima). Los APK de los juegos se firman
-con otra llave, la de cada autor.
+| Ruta | Responsabilidad |
+|---|---|
+| `app/src/main/java/com/zenithuzu/rpgmkport/MainActivity.java` | Asistente y navegación. |
+| `Origen.java`, `Juego.java` en el mismo paquete | Lectura del origen, datos y revisión de compatibilidad. |
+| `Constructor.java`, `Firma.java` en el mismo paquete | Edición y firma de APK; perfiles compatibles con PC. |
+| `Novedades.java` en el mismo paquete | Comprobación de novedades. |
+| `.github/workflows/apk.yml` | Compilación, comprobaciones y publicación. |
+
+El constructor utiliza `app/firma-app.jks`, una **llave de prueba incluida públicamente** para mantener la continuidad de sus actualizaciones. No debe tratarse como un secreto ni reutilizarse para otros proyectos. Los juegos usan sus propias llaves, que debes respaldar y mantener privadas.
 
 ## Créditos
 
@@ -108,18 +121,10 @@ con otra llave, la de cada autor.
 
 ## Licencia
 
-[GPL-2.0-or-later](LICENSE). Los juegos no están incluidos ni cubiertos por esta licencia:
-portar un fangame necesita el permiso de su autor, y los fangames de Pokémon usan propiedad
-de Nintendo, The Pokémon Company y Game Freak.
+El código de este proyecto se publica bajo [GPL-2.0-or-later](LICENSE). Los componentes de terceros conservan sus licencias y avisos. El carácter no lucrativo del proyecto no añade una prohibición de uso comercial a la GPL.
 
-En **0.3** crear e instalar son acciones independientes. La plantilla incorpora el
-editor y asignación de mando en paneles laterales, pausa visible, teclado sin
-superposición y objetivos explícitos de 60/120 FPS. El objetivo no garantiza los FPS
-medidos. Ver la [auditoría de interfaz](https://github.com/ZenithUzu/RMXP-Android-Ports/blob/main/docs/auditoria-interfaz.md).
+**Los juegos y sus recursos no están incluidos ni quedan cubiertos por esta licencia.** Usa juegos que tengas derecho a portar y respeta los permisos de sus autores antes de distribuir un APK.
 
-La plantilla solo se publica si pasa la prueba de interfaz compartida en Android 16.
-Las capturas y el informe quedan en el artefacto `interfaz-android` de Actions del
-repositorio de PC. Ese test sustituye únicamente el motor nativo: comprueba menús,
-coordenadas, visibilidad, teclas liberadas y objetivos de FPS; no mide rendimiento
-real ni confirma la vibración del teléfono. Las pruebas de juego están en la
-[guía de comprobación](https://github.com/ZenithUzu/RMXP-Android-Ports/blob/main/docs/pruebas-ports.md).
+Proyecto independiente, sin afiliación ni respaldo de Nintendo, The Pokémon Company, Game Freak, los responsables de RPG Maker ni los autores de los fangames. Las marcas y recursos pertenecen a sus respectivos titulares.
+
+El software se ofrece sin garantía, según su licencia. La asistencia con IA no modifica los derechos ni los créditos de terceros.
