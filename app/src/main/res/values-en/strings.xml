@@ -59,4 +59,13 @@
     <string name="fondo_gris">Gray</string>
     <string name="fondo_negro">Black</string>
     <string name="fondo_blanco">White</string>
+    <string name="soundfont">External SoundFont (.sf2)</string>
+    <string name="soundfont_sub">Optional, for MIDI music. Otherwise the game bundled SoundFont is used.</string>
+    <string name="soundfont_quitar">Use the game SoundFont</string>
+    <string name="soundfont_invalido">The selected file is not a valid SF2 SoundFont.</string>
+    <string name="universal">Universal APK (for other phones)</string>
+    <string name="universal_sub">Includes every architecture in the template. Off: smaller APK for this phone.</string>
+    <string name="guardar_log">Save build log</string>
+    <string name="guardar_log_sub">Builder steps and errors. Export the game log from the game menu.</string>
+    <string name="log_guardado">Log saved</string>
 </resources>

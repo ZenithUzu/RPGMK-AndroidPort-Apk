@@ -41,6 +41,19 @@
         </com.google.android.material.textfield.TextInputLayout>
         <include android:id="@+id/opcion_icono" layout="@layout/opcion" />
         <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/universal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/universal"
+            android:textAppearance="?attr/textAppearanceTitleMedium" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/universal_sub"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+        <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/ahorrar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

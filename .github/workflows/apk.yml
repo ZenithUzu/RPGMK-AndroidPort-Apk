@@ -14,6 +14,7 @@ permissions:
 jobs:
   apk:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -21,15 +22,34 @@ jobs:
           distribution: temurin
           java-version: 17
       - name: Bajar la plantilla (motor sin juego) de RMXP-Android-Ports
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p app/src/main/assets
+          curl -fsSL https://raw.githubusercontent.com/ZenithUzu/RMXP-Android-Ports/main/tools/rmxp_port.py -o /tmp/rmxp_port.py
+          motor=$(python3 - <<'PY'
+          import ast
+          tree = ast.parse(open('/tmp/rmxp_port.py', encoding='utf-8').read())
+          print(next(ast.literal_eval(n.value) for n in tree.body if isinstance(n, ast.Assign)
+                     and any(isinstance(t, ast.Name) and t.id == 'MOTOR_VERSION' for t in n.targets)))
+          PY
+          )
+          # Esperar la plantilla del mismo motor; no publicar una app con una plantilla vieja.
+          lista=false
+          for intento in $(seq 1 60); do
+            notas=$(gh api repos/ZenithUzu/RMXP-Android-Ports/releases/tags/plantilla-ultima --jq .body 2>/dev/null || true)
+            if [[ "$notas" == *"Motor $motor "* ]]; then lista=true; break; fi
+            echo "Esperando plantilla de $motor ($intento/60)..."
+            sleep 10
+          done
+          if [[ "$lista" != true ]]; then echo "La plantilla del motor actual todavia no esta lista"; exit 1; fi
           curl -fL -o app/src/main/assets/plantilla.apk \
             https://github.com/ZenithUzu/RMXP-Android-Ports/releases/download/plantilla-ultima/plantilla.apk
       - name: Compilar
         run: |
           # Id de esta versión (código + plantilla): la app lo compara para avisar si hay una nueva
           echo "RPGMK_ID=${GITHUB_SHA::7}-$(sha256sum app/src/main/assets/plantilla.apk | cut -c1-7)" >> $GITHUB_ENV
-          RPGMK_ID=${GITHUB_SHA::7}-$(sha256sum app/src/main/assets/plantilla.apk | cut -c1-7) ./gradlew --no-daemon assembleRelease
+          RPGMK_ID=${GITHUB_SHA::7}-$(sha256sum app/src/main/assets/plantilla.apk | cut -c1-7) ./gradlew --no-daemon testDebugUnitTest assembleRelease
       - name: Publicar
         env:
           GH_TOKEN: ${{ github.token }}

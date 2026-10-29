@@ -114,12 +114,15 @@ public final class Juego
         android.os.ParcelFileDescriptor pfd = c.getContentResolver().openFileDescriptor(zip, "r");
         if (pfd == null)
             throw new IOException("no se pudo abrir el .zip");
-        ABIERTOS.add(pfd); // debe seguir abierto mientras se usa
         // Se lee por el canal ya abierto: reabrir /proc/self/fd/N lo niegan algunos teléfonos
-        return new Origen.Zip(new FileInputStream(pfd.getFileDescriptor()).getChannel(), nombreDe(c, zip));
+        android.os.ParcelFileDescriptor.AutoCloseInputStream in = new android.os.ParcelFileDescriptor.AutoCloseInputStream(pfd);
+        try {
+            return new Origen.Zip(in.getChannel(), nombreDe(c, zip));
+        } catch (IOException | RuntimeException e) {
+            in.close();
+            throw e;
+        }
     }
-
-    private static final List<Object> ABIERTOS = new ArrayList<>();
 
     /** Una carpeta elegida con el selector: se lista de una vez por carpeta (rápido). */
     public static Origen abrirCarpeta(Context c, Uri arbol, Progreso p) throws IOException

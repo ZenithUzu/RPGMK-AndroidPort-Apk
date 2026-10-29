@@ -33,6 +33,26 @@ no hay Windows emulado.
 La app usa los colores de tu fondo de pantalla (Material You, Android 12 o más nuevo) y
 te avisa cuando hay una versión nueva (de la app o del motor).
 
+En la revisión **0.2** también puedes elegir un **SoundFont externo (.sf2)** y
+activar **APK universal** para incluir todas las arquitecturas de la plantilla,
+igual que en PC. Sin esa opción, se mantiene el APK pequeño para tu teléfono.
+El selector de SoundFont comprueba la cabecera SF2 antes de incluirlo.
+
+El asistente conserva nombre, autor, versión, icono y opciones al recrearse la
+pantalla. La orientación se mantiene durante la lectura y la creación para no
+duplicar trabajos. El APK anterior solo se reemplaza cuando el nuevo termina
+de firmarse, y se cierran los ZIP que ya no se usan.
+
+Si falla la creación, en el último paso aparece **Guardar registro de creación**.
+Ese TXT contiene los pasos y el error del constructor. Para un fallo dentro del
+juego, abre el juego y usa **Atrás → Guardar registro (log)**; el constructor no
+lee el log de otra app. En PC, la captura por USB está en **Log del juego**.
+
+La compilación de esta app espera una plantilla del mismo motor que solicita
+la herramienta de PC y ejecuta las pruebas antes de publicar `ultima`. Debes
+instalar la nueva versión de esta app para recibir esa plantilla; hacer Pull
+del código no actualiza una app ya instalada.
+
 Cada juego trae lo mismo que los de la PC: menú de opciones, controles editables,
 perfil de controles, gestor de partidas, vibración, parche `Win32API` para Essentials
 viejos y música MIDI. Ver [RMXP-Android-Ports](https://github.com/ZenithUzu/RMXP-Android-Ports#qué-trae-la-app).

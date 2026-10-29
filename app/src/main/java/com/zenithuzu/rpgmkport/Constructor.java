@@ -38,6 +38,7 @@ public final class Constructor
         public byte[] iconoPng;          // null = el icono de la plantilla
         public byte[] fondoPng;          // fondo del icono (gris, negro o blanco); null = el de la plantilla
         public boolean ahorrar;          // "Ahorrar espacio": Graphics/Audio se leen del APK
+        public File soundfont;           // null = el SoundFont que ya venga en el juego
         public List<String> abis = new ArrayList<>(); // vacía = todas las de la plantilla
     }
 
@@ -49,6 +50,12 @@ public final class Constructor
 
     private Constructor() {}
 
+    static boolean cabeceraSoundfont(byte[] h)
+    {
+        return h.length >= 12 && h[0] == 'R' && h[1] == 'I' && h[2] == 'F' && h[3] == 'F'
+            && h[8] == 's' && h[9] == 'f' && h[10] == 'b' && h[11] == 'k';
+    }
+
     /** Versión que siempre crece: minutos desde 2020 (igual que en la PC). */
     public static long versionCodeAhora() { return (System.currentTimeMillis() / 1000 - 1577836800L) / 60; }
 
@@ -56,6 +63,10 @@ public final class Constructor
     {
         p.paso("Leyendo la plantilla…");
         ApkModule apk = ApkModule.loadApkFile(plantilla);
+        File sinFirma = new File(salida.getPath() + ".sinfirma");
+        File firmado = new File(salida.getPath() + ".nuevo");
+        boolean cerrado = false;
+        try {
 
         // Id, versión y nombre (el de la app y el de la pantalla del juego)
         AndroidManifestBlock m = apk.getAndroidManifest();
@@ -92,7 +103,11 @@ public final class Constructor
             if (s.getAlias().startsWith("META-INF/"))
                 apk.removeInputSource(s.getAlias());
 
-        // Parches y biblioteca de Ruby de la plantilla → dentro del juego
+        p.paso("Agregando el juego…");
+        List<String> ligero = new ArrayList<>();
+        agregar(apk, juego, ligero, d.ahorrar);
+
+        // La plantilla tiene prioridad sobre parches antiguos que traiga el juego, igual que en PC.
         List<String> parches = new ArrayList<>();
         for (InputSource s : apk.getInputSources()) {
             String n = s.getAlias();
@@ -104,22 +119,22 @@ public final class Constructor
                 parches.add(resto);
             }
             apk.removeInputSource(n);
+            apk.removeInputSource("assets/game/" + resto);
             apk.add(new RenamedInputSource<>("assets/game/" + resto, s));
         }
         Collections.sort(parches);
 
-        // El juego
-        p.paso("Agregando el juego…");
-        List<String> ligero = new ArrayList<>();
-        agregar(apk, juego, ligero, d.ahorrar);
-        apk.add(new ByteInputSource(mkxpJson(juego, d.titulo, parches).getBytes(StandardCharsets.US_ASCII), "assets/game/mkxp.json"));
+        if (d.soundfont != null) {
+            apk.removeInputSource("assets/game/soundfont.sf2");
+            apk.add(new FileInputSource(d.soundfont, "assets/game/soundfont.sf2"));
+        }
+        apk.add(new ByteInputSource(mkxpJson(juego, d.titulo, parches, d.soundfont != null).getBytes(StandardCharsets.US_ASCII), "assets/game/mkxp.json"));
         if (d.ahorrar) {
             Collections.sort(ligero);
             apk.add(new ByteInputSource((String.join("\n", ligero) + "\n").getBytes(StandardCharsets.UTF_8), "assets/game/rmxp_ligero.txt"));
         }
 
         p.paso("Escribiendo el APK…");
-        File sinFirma = new File(salida.getPath() + ".sinfirma");
         java.util.Set<String> delJuego = new java.util.HashSet<>();
         for (String r : juego.archivos())
             delJuego.add("assets/game/" + r);
@@ -130,21 +145,29 @@ public final class Constructor
                 p.paso("Escribiendo el APK… " + n[0] + " de " + total + " archivos");
         });
         apk.close();
+        cerrado = true;
 
         p.paso("Firmando a nombre de " + firma.autor + "…");
         ApkSigner.SignerConfig sc = new ApkSigner.SignerConfig.Builder("juego", firma.llave,
             Collections.singletonList(firma.certificado)).build();
         new ApkSigner.Builder(Collections.singletonList(sc))
             .setInputApk(sinFirma)
-            .setOutputApk(salida)
+            .setOutputApk(firmado)
             .setV1SigningEnabled(false) // con v2 basta (Android 7+): se firma una sola vez
             .setMinSdkVersion(24)
             .setV2SigningEnabled(true)
             .setV3SigningEnabled(false)
             .build()
             .sign();
-        //noinspection ResultOfMethodCallIgnored
-        sinFirma.delete();
+        java.nio.file.Files.move(firmado.toPath(), salida.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        } finally {
+            try {
+                if (!cerrado) apk.close();
+            } finally {
+                sinFirma.delete();
+                firmado.delete();
+            }
+        }
     }
 
     private static void ponerNombre(ResXmlElement e, String nombre)
@@ -185,7 +208,7 @@ public final class Constructor
     }
 
     /** mkxp.json del juego con lo que necesita Android (como stage_game de la PC). Solo ASCII. */
-    static String mkxpJson(Origen juego, String titulo, List<String> parches) throws Exception
+    static String mkxpJson(Origen juego, String titulo, List<String> parches, boolean soundfontExterno) throws Exception
     {
         JSONObject conf = new JSONObject();
         String propio = juego.buscar("mkxp.json");
@@ -218,7 +241,9 @@ public final class Constructor
         if (load.length() == 1)
             load.put(".");
         conf.put("rubyLoadpath", load);
-        if (conf.optString("midiSoundFont").isEmpty()) {
+        if (soundfontExterno)
+            conf.put("midiSoundFont", "soundfont.sf2");
+        else if (conf.optString("midiSoundFont").isEmpty()) {
             String sf2 = null;
             for (String a : juego.archivos())
                 if (a.toLowerCase(Locale.ROOT).endsWith(".sf2") && a.split("/").length <= 4 && (sf2 == null || a.length() < sf2.length()))
@@ -234,7 +259,7 @@ public final class Constructor
     }
 
 
-    /** mkxp.json admite comentarios //; se quitan sin tocar lo que va entre comillas. */
+    /** Comentarios //, de bloque y comas finales, sin alterar cadenas del juego. */
     static String sinComentarios(String t)
     {
         StringBuilder out = new StringBuilder();
@@ -254,9 +279,31 @@ public final class Constructor
                 while (i < t.length() && t.charAt(i) != '\n')
                     i++;
                 out.append('\n');
+            } else if (c == '/' && i + 1 < t.length() && t.charAt(i + 1) == '*') {
+                int fin = t.indexOf("*/", i + 2);
+                i = fin < 0 ? t.length() : fin + 1;
+                out.append(' ');
             } else {
                 out.append(c);
             }
+        }
+        String limpio = out.toString();
+        out.setLength(0);
+        comillas = false;
+        for (int i = 0; i < limpio.length(); i++) {
+            char c = limpio.charAt(i);
+            if (comillas) {
+                out.append(c);
+                if (c == '\\' && i + 1 < limpio.length()) out.append(limpio.charAt(++i));
+                else if (c == '"') comillas = false;
+            } else if (c == '"') {
+                comillas = true;
+                out.append(c);
+            } else if (c == ',') {
+                int j = i + 1;
+                while (j < limpio.length() && Character.isWhitespace(limpio.charAt(j))) j++;
+                if (j >= limpio.length() || (limpio.charAt(j) != '}' && limpio.charAt(j) != ']')) out.append(c);
+            } else out.append(c);
         }
         return out.toString();
     }

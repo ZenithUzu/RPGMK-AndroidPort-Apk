@@ -39,8 +39,9 @@ public class MainActivity extends AppCompatActivity
     private Uri mJuegoUri;
     private boolean mJuegoZip;
     private Juego.Info mInfo;
-    private Uri mIcono;
-    private boolean mAhorrar, mOcupado;
+    private Uri mIcono, mSoundfont;
+    private int mOrientacion;
+    private boolean mAhorrar, mUniversal, mOcupado;
     private int mFondo;             // fondo del icono: 0 gris, 1 negro, 2 blanco
     private static final int[] FONDOS = { 0xFF5F6368, 0xFF000000, 0xFFFFFFFF };
 
@@ -51,9 +52,9 @@ public class MainActivity extends AppCompatActivity
     private MaterialButton mSiguiente;
     private final Handler mUi = new Handler(Looper.getMainLooper());
 
-    private ActivityResultLauncher<String[]> mElegirZip, mElegirIcono, mImportarFirma;
+    private ActivityResultLauncher<String[]> mElegirZip, mElegirIcono, mElegirSoundfont, mImportarFirma;
     private ActivityResultLauncher<Uri> mElegirCarpeta, mExportarFirma;
-    private ActivityResultLauncher<String> mGuardarApk;
+    private ActivityResultLauncher<String> mGuardarApk, mGuardarLog;
     private File mApk;              // el último APK creado
 
     @Override
@@ -75,7 +76,17 @@ public class MainActivity extends AppCompatActivity
         });
         mElegirIcono = registerForActivityResult(new ActivityResultContracts.OpenDocument(), uri -> {
             if (uri != null) {
+                guardarDatos();
+                conservarPermiso(uri);
                 mIcono = uri;
+                mostrar(mPaso);
+            }
+        });
+        mElegirSoundfont = registerForActivityResult(new ActivityResultContracts.OpenDocument(), uri -> {
+            if (uri != null) {
+                guardarDatos();
+                conservarPermiso(uri);
+                mSoundfont = uri;
                 mostrar(mPaso);
             }
         });
@@ -87,7 +98,10 @@ public class MainActivity extends AppCompatActivity
             if (uri != null) exportarFirma(uri);
         });
         mGuardarApk = registerForActivityResult(new ActivityResultContracts.CreateDocument("application/vnd.android.package-archive"), uri -> {
-            if (uri != null) guardarApk(uri);
+            if (uri != null) guardarArchivo(mApk, uri, R.string.apk_guardado);
+        });
+        mGuardarLog = registerForActivityResult(new ActivityResultContracts.CreateDocument("text/plain"), uri -> {
+            if (uri != null) guardarArchivo(new File(getFilesDir(), "constructor.log"), uri, R.string.log_guardado);
         });
 
         findViewById(R.id.atras).setOnClickListener(v -> atras());
@@ -106,11 +120,15 @@ public class MainActivity extends AppCompatActivity
         mSiguiente.setOnClickListener(v -> siguiente());
 
         if (state != null) {
-            mPaso = state.getInt("paso");
             String j = state.getString("juego");
             if (j != null) {
-                mostrar(mPaso);
-                importar(Uri.parse(j), state.getBoolean("zip"));
+                if (state.getString("icono") != null) mIcono = Uri.parse(state.getString("icono"));
+                if (state.getString("soundfont") != null) mSoundfont = Uri.parse(state.getString("soundfont"));
+                mAhorrar = state.getBoolean("ahorrar");
+                mUniversal = state.getBoolean("universal");
+                mFondo = Math.max(0, Math.min(FONDOS.length - 1, state.getInt("fondo")));
+                if (state.getString("apk") != null) mApk = new File(state.getString("apk"));
+                importar(Uri.parse(j), state.getBoolean("zip"), state);
                 return;
             }
         }
@@ -123,7 +141,19 @@ public class MainActivity extends AppCompatActivity
     protected void onSaveInstanceState(Bundle out)
     {
         super.onSaveInstanceState(out);
+        guardarDatos();
         out.putInt("paso", mPaso);
+        out.putBoolean("ahorrar", mAhorrar);
+        out.putBoolean("universal", mUniversal);
+        out.putInt("fondo", mFondo);
+        if (mInfo != null) {
+            out.putString("titulo", mInfo.titulo);
+            out.putString("autor", mInfo.autor);
+            out.putString("version", mInfo.version);
+        }
+        if (mIcono != null) out.putString("icono", mIcono.toString());
+        if (mSoundfont != null) out.putString("soundfont", mSoundfont.toString());
+        if (mApk != null) out.putString("apk", mApk.getPath());
         if (mJuegoUri != null) {
             out.putString("juego", mJuegoUri.toString());
             out.putBoolean("zip", mJuegoZip);
@@ -140,6 +170,7 @@ public class MainActivity extends AppCompatActivity
 
     private void siguiente()
     {
+        if (mOcupado) return;
         if (mPaso == 3) {
             if (!mOcupado)
                 crear();
@@ -153,6 +184,7 @@ public class MainActivity extends AppCompatActivity
 
     private void mostrar(int paso)
     {
+        if (paso >= 2 && (mInfo == null || mJuego == null)) paso = 1;
         mEstadoFirma = null;
         if (mPaso == 2 && paso != 2)
             guardarDatos();
@@ -313,7 +345,25 @@ public class MainActivity extends AppCompatActivity
 
     private void importar(Uri uri, boolean zip)
     {
+        importar(uri, zip, null);
+    }
+
+    private void importar(Uri uri, boolean zip, Bundle restaurar)
+    {
+        if (mOcupado) return;
+        cerrarJuego();
+        mInfo = null;
+        mJuegoUri = uri;
+        mJuegoZip = zip;
+        conservarPermiso(uri);
+        if (restaurar == null) {
+            mIcono = null;
+            mSoundfont = null;
+            mApk = null;
+        }
         mOcupado = true;
+        mOrientacion = getRequestedOrientation();
+        setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         mostrar(1);
         new Thread(() -> {
             String error = null;
@@ -334,16 +384,27 @@ public class MainActivity extends AppCompatActivity
             String fallo = error;
             mUi.post(() -> {
                 mOcupado = false;
+                if (isDestroyed()) {
+                    if (listo != null) try { listo.close(); } catch (java.io.IOException ignored) {}
+                    return;
+                }
                 if (listo != null && leido != null) {
                     mJuego = listo;
                     mJuegoUri = uri;
                     mJuegoZip = zip;
                     mInfo = leido;
-                    mIcono = null;
+                    if (restaurar != null) {
+                        mInfo.titulo = restaurar.getString("titulo", mInfo.titulo);
+                        mInfo.autor = restaurar.getString("autor", mInfo.autor);
+                        mInfo.version = restaurar.getString("version", mInfo.version);
+                    }
+                } else if (listo != null) {
+                    try { listo.close(); } catch (java.io.IOException ignored) {}
                 }
-                mostrar(1);
+                mostrar(mInfo != null && restaurar != null ? Math.max(1, Math.min(PASOS, restaurar.getInt("paso", 1))) : 1);
                 if (fallo != null)
                     mEstado.setText(fallo);
+                setRequestedOrientation(mOrientacion);
             });
         }).start();
     }
@@ -360,6 +421,9 @@ public class MainActivity extends AppCompatActivity
         MaterialSwitch ahorrar = v.findViewById(R.id.ahorrar);
         ahorrar.setChecked(mAhorrar);
         ahorrar.setOnCheckedChangeListener((b, on) -> mAhorrar = on);
+        MaterialSwitch universal = v.findViewById(R.id.universal);
+        universal.setChecked(mUniversal);
+        universal.setOnCheckedChangeListener((b, on) -> mUniversal = on);
 
         View icono = v.findViewById(R.id.opcion_icono);
         ImageView img = icono.findViewById(R.id.icono);
@@ -372,6 +436,15 @@ public class MainActivity extends AppCompatActivity
             img.setImageResource(R.drawable.ic_imagen);
         }
         icono.setOnClickListener(x -> mElegirIcono.launch(new String[] { "image/png" }));
+        opcion((ViewGroup) v, R.drawable.ic_mando, getString(R.string.soundfont),
+            mSoundfont == null ? getString(R.string.soundfont_sub) : nombreDe(mSoundfont),
+            x -> mElegirSoundfont.launch(new String[] { "*/*" }));
+        if (mSoundfont != null) {
+            MaterialButton quitar = new MaterialButton(this, null, com.google.android.material.R.attr.materialButtonOutlinedStyle);
+            quitar.setText(R.string.soundfont_quitar);
+            quitar.setOnClickListener(x -> { guardarDatos(); mSoundfont = null; mostrar(2); });
+            ((ViewGroup) v).addView(quitar);
+        }
 
         // Fondo del icono (igual que en la herramienta de PC)
         com.google.android.material.button.MaterialButtonToggleGroup fondos = new com.google.android.material.button.MaterialButtonToggleGroup(this);
@@ -554,6 +627,9 @@ public class MainActivity extends AppCompatActivity
         if (mApk != null && mApk.isFile() && !mOcupado)
             opcion(box, R.drawable.ic_zip, getString(R.string.guardar_apk), mApk.getName(),
                 x -> mGuardarApk.launch(mApk.getName()));
+        if (!mOcupado && new File(getFilesDir(), "constructor.log").isFile())
+            opcion(box, R.drawable.ic_zip, getString(R.string.guardar_log), getString(R.string.guardar_log_sub),
+                x -> mGuardarLog.launch("rpgmk-constructor-log.txt"));
         mSiguiente.setText(R.string.crear);
         mSiguiente.setEnabled(!mOcupado);
     }
@@ -561,6 +637,7 @@ public class MainActivity extends AppCompatActivity
     /** Arma el APK con la plantilla, lo firma e inicia la instalación. */
     private void crear()
     {
+        if (mJuego == null || mInfo == null || mOcupado) return;
         if (!getPackageManager().canRequestPackageInstalls()) {
             aviso(getString(R.string.permiso_instalar));
             startActivity(new android.content.Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
@@ -568,9 +645,13 @@ public class MainActivity extends AppCompatActivity
             return;
         }
         mOcupado = true;
+        mOrientacion = getRequestedOrientation();
+        setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         mostrar(3);
         new Thread(() -> {
             String fallo = null;
+            StringBuilder registro = new StringBuilder("RPGMK-AndroidPort " + BuildConfig.ID + "\nJuego: "
+                + mInfo.titulo + " " + mInfo.version + "\nAPK universal: " + mUniversal + "\n");
             File apk = new File(getCacheDir(), Juego.slug(mInfo.titulo, "juego") + ".apk");
             try {
                 File plantilla = plantilla();
@@ -583,7 +664,22 @@ public class MainActivity extends AppCompatActivity
                 d.version = mInfo.version.isEmpty() ? "1.0" : mInfo.version;
                 d.versionCode = Constructor.versionCodeAhora();
                 d.ahorrar = mAhorrar;
-                for (String abi : android.os.Build.SUPPORTED_ABIS)
+                if (mSoundfont != null) {
+                    File sf2 = new File(getCacheDir(), "elegida.sf2");
+                    try (java.io.InputStream in = getContentResolver().openInputStream(mSoundfont);
+                         java.io.OutputStream out = new java.io.FileOutputStream(sf2)) {
+                        if (in == null) throw new java.io.IOException(getString(R.string.soundfont_invalido));
+                        byte[] header = new byte[12];
+                        try { new java.io.DataInputStream(in).readFully(header); }
+                        catch (java.io.EOFException e) { throw new java.io.IOException(getString(R.string.soundfont_invalido), e); }
+                        if (!Constructor.cabeceraSoundfont(header))
+                            throw new java.io.IOException(getString(R.string.soundfont_invalido));
+                        out.write(header);
+                        Juego.copiar(in, out);
+                    }
+                    d.soundfont = sf2;
+                }
+                for (String abi : mUniversal ? new String[0] : android.os.Build.SUPPORTED_ABIS)
                     if (abi.equals("arm64-v8a") || abi.equals("armeabi-v7a")) {
                         d.abis.add(abi); // solo el motor de este teléfono
                         break;
@@ -601,34 +697,73 @@ public class MainActivity extends AppCompatActivity
                         d.iconoPng = b.toByteArray();
                     }
                 Constructor.construir(plantilla, mJuego, d, firma, apk,
-                    t -> mUi.post(() -> { if (mProgreso != null) mProgreso.setText(t); }));
+                    t -> {
+                        registro.append(t).append('\n');
+                        mUi.post(() -> { if (mProgreso != null) mProgreso.setText(t); });
+                    });
                 mApk = apk;
             } catch (Exception e) {
                 fallo = getString(R.string.error, String.valueOf(e.getMessage()));
+                java.io.StringWriter stack = new java.io.StringWriter();
+                e.printStackTrace(new java.io.PrintWriter(stack));
+                registro.append(stack);
+            } finally {
+                new File(getCacheDir(), "elegida.sf2").delete();
+                try {
+                    java.nio.file.Files.write(new File(getFilesDir(), "constructor.log").toPath(),
+                        registro.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                } catch (java.io.IOException ignored) {}
             }
             String error = fallo;
             mUi.post(() -> {
                 mOcupado = false;
+                if (isDestroyed()) { cerrarJuego(); return; }
                 mostrar(3);
                 if (error != null)
                     mProgreso.setText(error);
                 else
                     instalar(apk);
+                setRequestedOrientation(mOrientacion);
             });
         }).start();
     }
 
-    /** La plantilla viene dentro de esta app; se copia afuera una vez para poder leerla. */
+    /** Siempre se usa la plantilla de esta version, aunque la anterior mida lo mismo. */
     private File plantilla() throws java.io.IOException
     {
         File f = new File(getFilesDir(), "plantilla.apk");
-        long tam = getAssets().openFd("plantilla.apk").getLength();
-        if (!f.isFile() || f.length() != tam)
+        File temporal = new File(getFilesDir(), "plantilla.apk.tmp");
+        try {
             try (java.io.InputStream in = getAssets().open("plantilla.apk");
-                 java.io.OutputStream out = new java.io.FileOutputStream(f)) {
+                 java.io.OutputStream out = new java.io.FileOutputStream(temporal)) {
                 Juego.copiar(in, out);
             }
+            java.nio.file.Files.move(temporal.toPath(), f.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        } finally {
+            temporal.delete();
+        }
         return f;
+    }
+
+    private void conservarPermiso(Uri uri)
+    {
+        try {
+            getContentResolver().takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        } catch (SecurityException ignored) { /* algunos proveedores solo dan permiso temporal */ }
+    }
+
+    private void cerrarJuego()
+    {
+        if (mJuego != null) {
+            try { mJuego.close(); } catch (java.io.IOException ignored) {}
+            mJuego = null;
+        }
+    }
+
+    @Override protected void onDestroy()
+    {
+        if (!mOcupado) cerrarJuego();
+        super.onDestroy();
     }
 
     private void instalar(File apk)
@@ -676,17 +811,19 @@ public class MainActivity extends AppCompatActivity
             texto = getString(R.string.conflicto);
         else
             texto = getString(R.string.fallo_instalar, String.valueOf(intent.getStringExtra(android.content.pm.PackageInstaller.EXTRA_STATUS_MESSAGE)));
+        if (mInfo == null || mJuego == null) { aviso(texto); return; }
         if (mPaso != 3)
             mostrar(3);
         mProgreso.setText(texto);
     }
 
-    private void guardarApk(Uri uri)
+    private void guardarArchivo(File archivo, Uri uri, int mensaje)
     {
-        try (java.io.InputStream in = new java.io.FileInputStream(mApk);
+        try (java.io.InputStream in = new java.io.FileInputStream(archivo);
              java.io.OutputStream out = getContentResolver().openOutputStream(uri)) {
+            if (out == null) throw new java.io.IOException("No se pudo abrir el destino");
             Juego.copiar(in, out);
-            aviso(getString(R.string.apk_guardado));
+            aviso(getString(mensaje));
         } catch (Exception e) {
             aviso(getString(R.string.error, e.getMessage()));
         }

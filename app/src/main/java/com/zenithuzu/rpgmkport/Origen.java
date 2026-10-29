@@ -13,11 +13,12 @@ import java.util.Locale;
  * De dónde se leen los archivos del juego, sin copiarlo antes: una carpeta o el .zip tal cual.
  * Las rutas son relativas a la carpeta que tiene Game.ini, con "/".
  */
-public abstract class Origen
+public abstract class Origen implements java.io.Closeable
 {
     public abstract List<String> archivos();
     public abstract InputStream abrir(String rel) throws IOException;
     public abstract String nombre();
+    @Override public void close() throws IOException {}
 
     /** Un archivo dentro del juego sin importar mayúsculas (null si no está). */
     public String buscar(String rel)
@@ -90,8 +91,10 @@ public abstract class Origen
                     && (ini == null || n.length() < ini.length()))
                     ini = n;
             }
-            if (ini == null)
+            if (ini == null) {
+                zip.close();
                 throw new Juego.SinGameIni();
+            }
             prefijo = ini.substring(0, ini.length() - "game.ini".length());
             for (Enumeration<org.apache.commons.compress.archivers.zip.ZipArchiveEntry> en = zip.getEntries(); en.hasMoreElements(); ) {
                 org.apache.commons.compress.archivers.zip.ZipArchiveEntry e = en.nextElement();
@@ -103,5 +106,6 @@ public abstract class Origen
         @Override public String nombre() { return nombre; }
         @Override public List<String> archivos() { return lista; }
         @Override public InputStream abrir(String rel) throws IOException { return zip.getInputStream(zip.getEntry(prefijo + rel)); }
+        @Override public void close() throws IOException { zip.close(); }
     }
 }
