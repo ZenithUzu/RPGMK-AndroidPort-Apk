@@ -26,8 +26,8 @@ emulated Windows.
    and pick `juego.json` and `firma.jks` from `RMXP-Android-Ports\juegos\<game>`. Then the
    new APK installs **over** the PC one without losing saves. Otherwise a new signature is
    created in the author's name; back it up with **Export signature**.
-6. **Create and install**: builds the APK, signs it and Android asks you to install it. You
-   can also **Save the APK** to move it to another phone.
+6. **Build APK**: builds and signs the file. Then choose **Install built APK**,
+   **Save the APK**, or **Create another app**. Installing does not rebuild it.
 
 The app uses your wallpaper colors (Material You, Android 12 or newer) and tells you
 when a new version (of the app or the engine) is out.
