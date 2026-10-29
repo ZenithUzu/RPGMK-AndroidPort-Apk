@@ -13,8 +13,8 @@ import java.net.URL;
 /** Avisa si en GitHub hay una versión de la app (o de la plantilla del motor) más nueva que esta. */
 final class Novedades
 {
-    private static final String API = "https://api.github.com/repos/ZenithUzu/RPGMK-AndroidPort-Apk/releases/tags/ultima";
-    private static final String BAJAR = "https://github.com/ZenithUzu/RPGMK-AndroidPort-Apk/releases/download/ultima/Portemon.apk";
+    private static final String API = "https://api.github.com/repos/ZenithUzu/portemon-android/releases/tags/ultima";
+    private static final String BAJAR = "https://github.com/ZenithUzu/portemon-android/releases/download/ultima/Portemon.apk";
 
     static void revisar(Activity a)
     {

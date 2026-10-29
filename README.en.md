@@ -4,9 +4,9 @@
 
 Build an APK for an **RPG Maker XP, VX or VX Ace game directly on your phone**, with its own name, icon and application ID. This also targets fangames made with Pokémon Essentials.
 
-It uses **mkxp-z** and the shared template from [Portémon PC](https://github.com/ZenithUzu/RMXP-Android-Ports), the companion Windows tool. The generated APK runs the game without a separate player app or emulating Windows.
+It uses **mkxp-z** and the shared template from [Portémon PC](https://github.com/ZenithUzu/portemon-pc), the companion Windows tool. The generated APK runs the game without a separate player app or emulating Windows.
 
-**[Download](https://github.com/ZenithUzu/RPGMK-AndroidPort-Apk/releases/tag/ultima) · [Quick start](#quick-start) · [Report an issue](#diagnostics-and-support) · [Credits](#credits) · [License](#license)**
+**[Download](https://github.com/ZenithUzu/portemon-android/releases/tag/ultima) · [Quick start](#quick-start) · [Report an issue](#diagnostics-and-support) · [Credits](#credits) · [License](#license)**
 
 > **Status: experimental and in testing.** Building, signing and installing an APK does not guarantee compatibility with every game. Performance and available features depend on the game and phone.
 
@@ -43,7 +43,7 @@ No PC, Android Studio or on-device engine compilation is required.
 
 ## Quick start
 
-1. Download **Portemon.apk** from [Releases](https://github.com/ZenithUzu/RPGMK-AndroidPort-Apk/releases/tag/ultima), install it and tap **Empezar** (Get started).
+1. Download **Portemon.apk** from [Releases](https://github.com/ZenithUzu/portemon-android/releases/tag/ultima), install it and open **Portémon**.
 2. Choose the game ZIP or folder. The original is not modified. Review warnings about DLLs, WMV videos and Windows calls such as `Win32API`.
 3. Check the **name, author, version and icon**. For MIDI music, select an **external SoundFont (.sf2)** if needed; its header is validated.
 4. Check the **signing key**. For a game already built on PC, import `juego.json` and `firma.jks` from that game's profile folder. For a new game, export and back up the generated key.
@@ -64,7 +64,7 @@ No PC, Android Studio or on-device engine compilation is required.
 | Saves and audio | Save manager, control profiles and MIDI through FluidSynth and a SoundFont. |
 | Diagnostics | Exportable build log; generated games can export their own runtime log. |
 
-FPS targets do not guarantee measured performance. See the [runtime features](https://github.com/ZenithUzu/RMXP-Android-Ports/blob/main/README.en.md) and [PC/Android comparison](https://github.com/ZenithUzu/RMXP-Android-Ports/blob/main/docs/paridad-pc-android.md) (Spanish).
+FPS targets do not guarantee measured performance. See the [runtime features](https://github.com/ZenithUzu/portemon-pc/blob/main/README.en.md) and [PC/Android comparison](https://github.com/ZenithUzu/portemon-pc/blob/main/docs/paridad-pc-android.md) (Spanish).
 
 ## Updating and preserving saves and keys
 
@@ -85,11 +85,11 @@ A certificate may contain the author's name, but the tool generates the key: **i
 - **USB capture:** use **Log del juego** in the PC tool.
 - **Silent MIDI:** check for a bundled SoundFont or select an external `.sf2` before building.
 
-Open an [issue](https://github.com/ZenithUzu/RPGMK-AndroidPort-Apk/issues) with builder/engine version, game/version, phone model, Android version, reproduction steps and log. For FPS issues, include the target, current screen Hz, area and turbo state.
+Open an [issue](https://github.com/ZenithUzu/portemon-android/issues) with builder/engine version, game/version, phone model, Android version, reproduction steps and log. For FPS issues, include the target, current screen Hz, area and turbo state.
 
 Remove personal data from attachments. Do not publish private signing keys, passwords or complete games.
 
-The [recommended tests](https://github.com/ZenithUzu/RMXP-Android-Ports/blob/main/docs/pruebas-ports.md) (Spanish) cover installation, updating, saves, menus and controls. UI tests with a simulated engine do not measure real FPS or confirm physical vibration.
+The [recommended tests](https://github.com/ZenithUzu/portemon-pc/blob/main/docs/pruebas-ports.md) (Spanish) cover installation, updating, saves, menus and controls. UI tests with a simulated engine do not measure real FPS or confirm physical vibration.
 
 ## How it works and stays aligned with PC
 
@@ -119,7 +119,7 @@ The builder uses `app/firma-app.jks`, a **publicly included test key** to preser
 
 - [ARSCLib](https://github.com/REAndroid/ARSCLib) (Apache-2.0) and [apksig](https://android.googlesource.com/platform/tools/apksig) (Apache-2.0): editing and signing the APK on the phone.
 
-- [Portémon PC](https://github.com/ZenithUzu/RMXP-Android-Ports): engine, controls,
+- [Portémon PC](https://github.com/ZenithUzu/portemon-pc): engine, controls,
   menu and patches shipped with each game.
 - [mkxp-z](https://github.com/mkxp-z/mkxp-z) and the projects it builds on (see
   RMXP-Android-Ports' credits).

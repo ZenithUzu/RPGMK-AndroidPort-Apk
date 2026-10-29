@@ -4,9 +4,9 @@
 
 Crea un APK de un juego de **RPG Maker XP, VX o VX Ace desde el teléfono**, con su propio nombre, icono e identificador. Está orientado también a fangames hechos con Pokémon Essentials.
 
-Usa el motor **mkxp-z** y la plantilla compartida de [Portémon PC](https://github.com/ZenithUzu/RMXP-Android-Ports), la herramienta compañera para Windows. El APK generado ejecuta el juego sin necesitar una app reproductora aparte ni emular Windows.
+Usa el motor **mkxp-z** y la plantilla compartida de [Portémon PC](https://github.com/ZenithUzu/portemon-pc), la herramienta compañera para Windows. El APK generado ejecuta el juego sin necesitar una app reproductora aparte ni emular Windows.
 
-**[Descargar la app](https://github.com/ZenithUzu/RPGMK-AndroidPort-Apk/releases/tag/ultima) · [Inicio rápido](#inicio-rápido) · [Reportar un problema](#diagnóstico-y-soporte) · [Créditos](#créditos) · [Licencia](#licencia)**
+**[Descargar la app](https://github.com/ZenithUzu/portemon-android/releases/tag/ultima) · [Inicio rápido](#inicio-rápido) · [Reportar un problema](#diagnóstico-y-soporte) · [Créditos](#créditos) · [Licencia](#licencia)**
 
 > **Estado: experimental y en pruebas.** Crear, firmar e instalar un APK no garantiza compatibilidad con todos los juegos. El rendimiento y las funciones disponibles dependen del juego y del teléfono.
 
@@ -43,7 +43,7 @@ No necesitas PC, Android Studio ni compilar el motor en el teléfono.
 
 ## Inicio rápido
 
-1. Descarga **Portemon.apk** desde [Releases](https://github.com/ZenithUzu/RPGMK-AndroidPort-Apk/releases/tag/ultima), instálalo y abre **Empezar**.
+1. Descarga **Portemon.apk** desde [Releases](https://github.com/ZenithUzu/portemon-android/releases/tag/ultima), instálalo y abre **Portémon**.
 2. Elige el ZIP o la carpeta del juego. El original no se modifica. Revisa los avisos sobre DLL, videos WMV y llamadas de Windows como `Win32API`.
 3. Comprueba **nombre, autor, versión e icono**. Si necesitas música MIDI, selecciona un **SoundFont externo (.sf2)**; el selector comprueba su cabecera.
 4. Revisa la **firma**. Si ya creaste ese juego en PC, importa `juego.json` y `firma.jks` desde la carpeta del perfil del juego. Si es nuevo, exporta y respalda la firma generada.
@@ -64,7 +64,7 @@ No necesitas PC, Android Studio ni compilar el motor en el teléfono.
 | Partidas y audio | Gestor de partidas, perfiles de controles y MIDI mediante FluidSynth y un SoundFont. |
 | Diagnóstico | Registro de creación exportable; el juego generado permite exportar su propio log. |
 
-Los objetivos de FPS no garantizan el rendimiento real. Consulta las [funciones del motor](https://github.com/ZenithUzu/RMXP-Android-Ports#qué-trae-la-app) y la [comparación entre PC y Android](https://github.com/ZenithUzu/RMXP-Android-Ports/blob/main/docs/paridad-pc-android.md).
+Los objetivos de FPS no garantizan el rendimiento real. Consulta las [funciones del motor](https://github.com/ZenithUzu/portemon-pc#qué-trae-la-app) y la [comparación entre PC y Android](https://github.com/ZenithUzu/portemon-pc/blob/main/docs/paridad-pc-android.md).
 
 ## Actualizar sin perder firmas y partidas
 
@@ -85,17 +85,17 @@ El certificado puede contener el nombre del autor, pero la llave la genera la he
 - **Captura por USB:** utiliza **Log del juego** en la herramienta de PC.
 - **MIDI sin sonido:** comprueba que el juego incluya un SoundFont o selecciona un archivo `.sf2` antes de crear el APK.
 
-Abre un [issue](https://github.com/ZenithUzu/RPGMK-AndroidPort-Apk/issues) con la versión del constructor y del motor, juego y versión, teléfono, Android, pasos para reproducir el fallo y registro. Para problemas de FPS, indica objetivo, Hz actuales, zona y estado del turbo.
+Abre un [issue](https://github.com/ZenithUzu/portemon-android/issues) con la versión del constructor y del motor, juego y versión, teléfono, Android, pasos para reproducir el fallo y registro. Para problemas de FPS, indica objetivo, Hz actuales, zona y estado del turbo.
 
 Revisa los adjuntos para retirar datos personales. No publiques firmas privadas, contraseñas ni juegos completos.
 
-Las [pruebas recomendadas](https://github.com/ZenithUzu/RMXP-Android-Ports/blob/main/docs/pruebas-ports.md) cubren instalación, actualización, partidas, menú y controles. Las pruebas de interfaz con motor simulado no miden FPS reales ni confirman la vibración física.
+Las [pruebas recomendadas](https://github.com/ZenithUzu/portemon-pc/blob/main/docs/pruebas-ports.md) cubren instalación, actualización, partidas, menú y controles. Las pruebas de interfaz con motor simulado no miden FPS reales ni confirman la vibración física.
 
 ## Cómo funciona y cómo se sincroniza con PC
 
 La app incluye una **plantilla de APK con el motor ya compilado**. Inserta los archivos del juego, modifica sus datos y firma el resultado con una llave por juego.
 
-El motor, el menú y los controles se mantienen en RMXP-Android-Ports. La compilación de este constructor espera la plantilla correspondiente al motor solicitado por PC y ejecuta sus comprobaciones antes de publicar `ultima`. Las dos herramientas comparten esa base; sus flujos de construcción e instalación son distintos.
+El motor, el menú y los controles se mantienen en Portémon PC. La compilación de este constructor espera la plantilla correspondiente al motor solicitado por PC y ejecuta sus comprobaciones antes de publicar `ultima`. Las dos herramientas comparten esa base; sus flujos de construcción e instalación son distintos.
 
 ## Para desarrolladores
 
@@ -119,7 +119,7 @@ El constructor utiliza `app/firma-app.jks`, una **llave de prueba incluida públ
 
 - [ARSCLib](https://github.com/REAndroid/ARSCLib) (Apache-2.0) y [apksig](https://android.googlesource.com/platform/tools/apksig) (Apache-2.0): editar y firmar el APK en el teléfono.
 
-- [Portémon PC](https://github.com/ZenithUzu/RMXP-Android-Ports): motor, controles,
+- [Portémon PC](https://github.com/ZenithUzu/portemon-pc): motor, controles,
   menú y parches que lleva cada juego.
 - [mkxp-z](https://github.com/mkxp-z/mkxp-z) y los proyectos en los que se apoya (ver los
   créditos de RMXP-Android-Ports).
