@@ -114,3 +114,10 @@ En **0.3** crear e instalar son acciones independientes. La plantilla incorpora 
 editor y asignación de mando en paneles laterales, pausa visible, teclado sin
 superposición y objetivos explícitos de 60/120 FPS. El objetivo no garantiza los FPS
 medidos. Ver la [auditoría de interfaz](https://github.com/ZenithUzu/RMXP-Android-Ports/blob/main/docs/auditoria-interfaz.md).
+
+La plantilla solo se publica si pasa la prueba de interfaz compartida en Android 16.
+Las capturas y el informe quedan en el artefacto `interfaz-android` de Actions del
+repositorio de PC. Ese test sustituye únicamente el motor nativo: comprueba menús,
+coordenadas, visibilidad, teclas liberadas y objetivos de FPS; no mide rendimiento
+real ni confirma la vibración del teléfono. Las pruebas de juego están en la
+[guía de comprobación](https://github.com/ZenithUzu/RMXP-Android-Ports/blob/main/docs/pruebas-ports.md).
