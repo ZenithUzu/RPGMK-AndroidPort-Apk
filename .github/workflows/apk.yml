@@ -67,6 +67,29 @@ jobs:
           # Id de esta versión (código + plantilla): la app lo compara para avisar si hay una nueva
           echo "RPGMK_ID=${GITHUB_SHA::7}-$(sha256sum app/src/main/assets/plantilla.apk | cut -c1-7)" >> $GITHUB_ENV
           RPGMK_ID=${GITHUB_SHA::7}-$(sha256sum app/src/main/assets/plantilla.apk | cut -c1-7) ./gradlew --no-daemon testDebugUnitTest assembleRelease
+      - name: Verificar firma y estructura del APK
+        run: |
+          build_tools=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          "$build_tools/apksigner" verify --verbose --print-certs app/build/outputs/apk/release/app-release.apk
+          "$build_tools/zipalign" -c -v 4 app/build/outputs/apk/release/app-release.apk
+      - name: Habilitar KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Probar instalación y apertura en Android 16
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          script: |
+            adb install --no-streaming app/build/outputs/apk/release/app-release.apk
+            adb install -r --no-streaming app/build/outputs/apk/release/app-release.apk
+            adb shell am start -W -n com.zenithuzu.rpgmkport/.MainActivity
+            sleep 3
+            adb shell pidof com.zenithuzu.rpgmkport || { adb logcat -d -s AndroidRuntime; exit 1; }
       - name: Publicar
         env:
           GH_TOKEN: ${{ github.token }}
