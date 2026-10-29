@@ -140,3 +140,7 @@ The software is provided without warranty under its license. AI assistance does 
 ### In-game appearance
 
 The shared template includes side panels for button, label/symbol and key-badge colors, #RRGGBB input and continuous 0–100% opacity. The performance overlay offers data selection, compact/list layout, text color and size, background opacity and position. Android 12+ wallpaper colors still theme the interface; manual colors remain fixed. Rebuild and install an existing game APK with the same signing key to update its runtime UI.
+
+### Portémon 0.8
+
+The shared template adds RGSS Linker/FmodEx bootstrap compatibility, a flat-map H-mode7 fallback and searchable physical key/button/axis mappings with app actions. Existing profiles and dynamic colors are retained. See [Insurgence compatibility scope](https://github.com/ZenithUzu/portemon-pc/blob/main/docs/compatibilidad-insurgence.md); the complete game and all forks have not been verified. Rebuild game APKs using their original signing key to update the runtime.

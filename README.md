@@ -140,3 +140,7 @@ El software se ofrece sin garantía, según su licencia. La asistencia con IA no
 ### Personalización dentro del juego
 
 La plantilla compartida incorpora paneles laterales para el color y la opacidad de botones, letras/símbolos e insignias de teclas, con selector de color, entrada #RRGGBB y opacidad continua de 0–100 %. El medidor permite elegir datos, formato compacto/lista, color, tamaño, fondo y posición. La interfaz mantiene los colores dinámicos del fondo de pantalla en Android 12+; los colores elegidos manualmente se conservan. Para actualizar un juego existente, vuelve a crear e instalar su APK conservando la misma firma.
+
+### Portémon 0.8
+
+La plantilla incorpora la corrección del inicio RGSS Linker/FmodEx y un respaldo de mapas planos para H-mode7, junto con captura de botones, teclas y ejes y búsqueda de destinos y acciones de la app. Se conservan los perfiles existentes y los colores dinámicos. Consulta el [alcance de compatibilidad con Insurgence](https://github.com/ZenithUzu/portemon-pc/blob/main/docs/compatibilidad-insurgence.md); no se ha verificado el juego completo ni todos sus forks. Vuelve a crear el APK del juego con la misma firma para aplicar la plantilla nueva.
