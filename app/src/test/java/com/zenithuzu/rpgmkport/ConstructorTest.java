@@ -19,10 +19,12 @@ public class ConstructorTest
         assertFalse(Constructor.cabeceraSoundfont("RIFF0000WAVE".getBytes(StandardCharsets.US_ASCII)));
         assertTrue(Constructor.cabeceraSoundfont("RIFF0000sfbk".getBytes(StandardCharsets.US_ASCII)));
     }
-    private Origen juego(String config)
+    private Origen juego(String config, String... extras)
     {
+        List<String> nombres = new java.util.ArrayList<>(Arrays.asList("mkxp.json", "Audio/fuente.sf2"));
+        Collections.addAll(nombres, extras);
         return new Origen() {
-            @Override public List<String> archivos() { return Arrays.asList("mkxp.json", "Audio/fuente.sf2"); }
+            @Override public List<String> archivos() { return nombres; }
             @Override public InputStream abrir(String rel) {
                 return new ByteArrayInputStream(config.getBytes(StandardCharsets.UTF_8));
             }
@@ -60,5 +62,12 @@ public class ConstructorTest
         JSONObject o = new JSONObject(Constructor.mkxpJson(juego("{\"midiSoundFont\":\"viejo.sf2\"}"),
             "Prueba", Collections.emptyList(), true));
         assertEquals("soundfont.sf2", o.getString("midiSoundFont"));
+    }
+
+    @Test public void soundfontDeLaRaizTienePrioridadComoEnPc() throws Exception
+    {
+        JSONObject o = new JSONObject(Constructor.mkxpJson(juego("{}", "fuente-nombre-muy-largo.sf2", "a/f.sf2"),
+            "Prueba", Collections.emptyList(), false));
+        assertEquals("fuente-nombre-muy-largo.sf2", o.getString("midiSoundFont"));
     }
 }

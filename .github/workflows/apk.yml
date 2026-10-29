@@ -11,6 +11,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: apk-main
+  cancel-in-progress: true
+
 jobs:
   apk:
     runs-on: ubuntu-latest

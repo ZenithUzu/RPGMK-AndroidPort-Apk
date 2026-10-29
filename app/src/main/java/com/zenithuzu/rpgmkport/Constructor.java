@@ -246,7 +246,9 @@ public final class Constructor
         else if (conf.optString("midiSoundFont").isEmpty()) {
             String sf2 = null;
             for (String a : juego.archivos())
-                if (a.toLowerCase(Locale.ROOT).endsWith(".sf2") && a.split("/").length <= 4 && (sf2 == null || a.length() < sf2.length()))
+                if (a.toLowerCase(Locale.ROOT).endsWith(".sf2") && (sf2 == null
+                    || a.split("/").length < sf2.split("/").length
+                    || (a.split("/").length == sf2.split("/").length && a.compareTo(sf2) < 0)))
                     sf2 = a;
             if (sf2 != null)
                 conf.put("midiSoundFont", sf2);
