@@ -93,4 +93,7 @@
     <string name="source_folder_hint">Juego extraído</string>
     <string name="insurgence">Insurgence y derivados (experimental)</string>
     <string name="insurgence_sub">Para Insurgence/Detergent: adapta Ruby antiguo, caché y GIF; H-mode7 usa mapas planos. No garantiza todos los mods.</string>
+    <string name="motor_juego">Motor del juego</string>
+    <string name="motor_auto">Automático</string>
+    <string name="motor_runtime">%1$s · RGSS%2$d · mkxp-z. Los plugins y las DLL pueden requerir adaptaciones.</string>
 </resources>

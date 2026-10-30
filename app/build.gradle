@@ -10,8 +10,8 @@ android {
         applicationId 'com.zenithuzu.rpgmkport'
         minSdk 26
         targetSdk 34
-        versionCode 12
-        versionName '0.12'
+        versionCode 13
+        versionName '0.13'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         buildConfigField 'long', 'BUILT_AT', "${System.currentTimeMillis()}L"
         buildConfigField 'String', 'ID', "\"${System.getenv('RPGMK_ID') ?: 'local'}\""

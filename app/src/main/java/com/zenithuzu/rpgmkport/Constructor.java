@@ -37,6 +37,7 @@ public final class Constructor
         public long versionCode;
         public byte[] iconoPng;          // null = el icono de la plantilla
         public byte[] fondoPng;          // fondo del icono (gris, negro o blanco); null = el de la plantilla
+        public int motor;               // 0=automatic, 1=XP, 2=VX, 3=VX Ace
         public boolean insurgence;       // opt-in legacy Essentials compatibility profile
         public boolean ahorrar;          // "Ahorrar espacio": Graphics/Audio se leen del APK
         public File soundfont;           // null = el SoundFont que ya venga en el juego
@@ -62,6 +63,9 @@ public final class Constructor
 
     public static void construir(File plantilla, Origen juego, Datos d, Firma firma, File salida, Progreso p) throws Exception
     {
+        Motor motor = Motor.detectar(juego,d.motor);
+        if(d.insurgence && motor.rgss!=1)throw new IllegalArgumentException("El perfil Insurgence es solo para RPG Maker XP.");
+        p.paso("Motor: "+motor.nombre()+" · RGSS"+motor.rgss+" · mkxp-z");
         p.paso("Leyendo la plantilla…");
         ApkModule apk = ApkModule.loadApkFile(plantilla);
         File sinFirma = new File(salida.getPath() + ".sinfirma");
@@ -129,7 +133,14 @@ public final class Constructor
             apk.removeInputSource("assets/game/soundfont.sf2");
             apk.add(new FileInputSource(d.soundfont, "assets/game/soundfont.sf2"));
         }
-        apk.add(new ByteInputSource(mkxpJson(juego, d.titulo, parches, d.soundfont != null).getBytes(StandardCharsets.US_ASCII), "assets/game/mkxp.json"));
+        JSONObject conf = new JSONObject(mkxpJson(juego, d.titulo, parches, d.soundfont != null));
+        conf.put("rgssVersion",motor.rgss);
+        apk.add(new ByteInputSource(escaparJson(conf.toString()).getBytes(StandardCharsets.US_ASCII), "assets/game/mkxp.json"));
+        String ini = juego.buscar("Game.ini");
+        apk.removeInputSource("assets/game/"+ini);
+        apk.add(new ByteInputSource(motor.ini(Juego.leerTexto(juego,ini),d.titulo).getBytes(StandardCharsets.UTF_8),"assets/game/Game.ini"));
+        apk.removeInputSource("assets/game/rmxp_motor.txt");
+        apk.add(new ByteInputSource((motor.rgss+"\n").getBytes(StandardCharsets.US_ASCII),"assets/game/rmxp_motor.txt"));
         apk.removeInputSource("assets/game/rmxp_insurgence.txt");
         apk.add(new ByteInputSource((d.insurgence ? "1\n" : "0\n").getBytes(StandardCharsets.US_ASCII),
             "assets/game/rmxp_insurgence.txt"));
@@ -186,7 +197,7 @@ public final class Constructor
     {
         for (String r : o.archivos()) {
             String bajo = r.toLowerCase(Locale.ROOT);
-            if (termina(bajo, FUERA) || bajo.equals("mkxp.json") || bajo.equals("rmxp_insurgence.txt"))
+            if (termina(bajo, FUERA) || bajo.equals("mkxp.json") || bajo.equals("rmxp_insurgence.txt") || bajo.equals("rmxp_motor.txt"))
                 continue;
             InputSource s = o instanceof Origen.Carpeta
                 ? new FileInputSource(((Origen.Carpeta) o).archivo(r), "assets/game/" + r)
@@ -259,9 +270,14 @@ public final class Constructor
             if (sf2 != null)
                 conf.put("midiSoundFont", sf2);
         }
-        // Solo ASCII: así el motor no intenta adivinar la codificación (se caía con algunas)
+        return escaparJson(conf.toString(2));
+    }
+
+    private static String escaparJson(String json)
+    {
+        // Solo ASCII: evita que el motor intente adivinar la codificación del JSON.
         StringBuilder sb = new StringBuilder();
-        for (char c : conf.toString(2).toCharArray())
+        for (char c : json.toCharArray())
             sb.append(c < 128 ? String.valueOf(c) : String.format("\\u%04x", (int) c));
         return sb.toString();
     }

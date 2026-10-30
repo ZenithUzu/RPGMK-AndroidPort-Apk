@@ -76,5 +76,5 @@ jobs:
         run: |
           cp app/build/outputs/apk/release/app-release.apk Portemon.apk
           gh release delete ultima --yes --cleanup-tag || true
-          gh release create ultima Portemon.apk --title "Portémon 0.12" \
+          gh release create ultima Portemon.apk --title "Portémon 0.13" \
             --notes "Compilada de ${GITHUB_SHA::7}. id: ${RPGMK_ID}. Descarga Portemon.apk desde el teléfono e instálala."

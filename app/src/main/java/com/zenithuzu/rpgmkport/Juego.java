@@ -42,6 +42,7 @@ public final class Juego
     {
         public String titulo = "", autor = "", version = "";
         public int archivos;
+        public String motor = "";
         public List<String> avisos = new ArrayList<>();
     }
 
@@ -245,6 +246,8 @@ public final class Juego
         info.titulo = o.nombre();
         info.archivos = o.archivos().size();
         info.avisos = revisar(o);
+        try { info.motor = Motor.detectar(o,0).nombre(); }
+        catch(IllegalArgumentException error) { info.motor=error.getMessage();info.avisos.add(error.getMessage()); }
         String ini = o.buscar("Game.ini");
         if (ini != null) {
             Matcher m = Pattern.compile("^\\s*Title\\s*=\\s*(.+?)\\s*$", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE).matcher(leerTexto(o, ini));

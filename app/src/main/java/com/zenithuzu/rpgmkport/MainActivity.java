@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity
     private Uri mIcono, mSoundfont;
     private int mOrientacion;
     private boolean mAhorrar, mUniversal, mOcupado, mInsurgence;
+    private int mMotor;             // 0=automatic; otherwise RGSS 1/2/3
     private int mFondo;             // fondo del icono: 0 gris, 1 negro, 2 blanco
     private static final int[] FONDOS = { 0xFF5F6368, 0xFF000000, 0xFFFFFFFF };
 
@@ -125,6 +126,7 @@ public class MainActivity extends AppCompatActivity
                 if (state.getString("soundfont") != null) mSoundfont = Uri.parse(state.getString("soundfont"));
                 mAhorrar = state.getBoolean("ahorrar");
                 mInsurgence = state.getBoolean("insurgence");
+                mMotor = Math.max(0,Math.min(3,state.getInt("motor")));
                 mUniversal = state.getBoolean("universal");
                 mFondo = Math.max(0, Math.min(FONDOS.length - 1, state.getInt("fondo")));
                 if (state.getString("apk") != null) mApk = new File(state.getString("apk"));
@@ -145,6 +147,7 @@ public class MainActivity extends AppCompatActivity
         out.putInt("paso", mPaso);
         out.putBoolean("ahorrar", mAhorrar);
         out.putBoolean("insurgence", mInsurgence);
+        out.putInt("motor",mMotor);
         out.putBoolean("universal", mUniversal);
         out.putInt("fondo", mFondo);
         if (mInfo != null) {
@@ -314,6 +317,7 @@ public class MainActivity extends AppCompatActivity
         box.addView(mEstado);
         if (mJuego != null && mInfo != null)
             mEstado.setText(getString(R.string.juego_listo, mInfo.titulo, mInfo.version)
+                + "\n" + getString(R.string.motor_juego) + ": " + mInfo.motor
                 + "\n" + getString(R.string.archivos, mInfo.archivos)
                 + (mInfo.avisos.isEmpty() ? "\n✓ " + getString(R.string.compatible) : "\n⚠ " + String.join("\n⚠ ", mInfo.avisos)));
 
@@ -374,6 +378,7 @@ public class MainActivity extends AppCompatActivity
                     mJuegoUri = uri;
                     mJuegoZip = zip;
                     mInfo = leido;
+                    if(restaurar==null){mMotor=0;mInsurgence=false;}
                     if (restaurar != null) {
                         mInfo.titulo = restaurar.getString("titulo", mInfo.titulo);
                         mInfo.autor = restaurar.getString("autor", mInfo.autor);
@@ -402,6 +407,12 @@ public class MainActivity extends AppCompatActivity
         MaterialSwitch insurgence = v.findViewById(R.id.insurgence);
         insurgence.setChecked(mInsurgence);
         insurgence.setOnCheckedChangeListener((b, on) -> mInsurgence = on);
+        android.widget.AutoCompleteTextView motor = v.findViewById(R.id.motor_juego);
+        String[] engines={getString(R.string.motor_auto),Motor.NOMBRES[1],Motor.NOMBRES[2],Motor.NOMBRES[3]};
+        motor.setAdapter(new android.widget.ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,engines));
+        motor.setText(engines[mMotor],false);
+        motor.setOnItemClickListener((parent,view,position,id)->{mMotor=position;actualizarMotor(v);});
+        actualizarMotor(v);
         MaterialSwitch ahorrar = v.findViewById(R.id.ahorrar);
         ahorrar.setChecked(mAhorrar);
         ahorrar.setOnCheckedChangeListener((b, on) -> mAhorrar = on);
@@ -572,6 +583,23 @@ public class MainActivity extends AppCompatActivity
         return u.getLastPathSegment();
     }
 
+    private void actualizarMotor(View view)
+    {
+        MaterialSwitch legacy=view.findViewById(R.id.insurgence);
+        TextView hint=view.findViewById(R.id.motor_hint);
+        try {
+            Motor engine=Motor.detectar(mJuego,mMotor);
+            mInfo.motor=engine.nombre();
+            hint.setText(getString(R.string.motor_runtime,engine.nombre(),engine.rgss));
+            legacy.setEnabled(engine.rgss==1);
+            if(engine.rgss!=1){mInsurgence=false;legacy.setChecked(false);}
+            mSiguiente.setEnabled(!mOcupado);
+        } catch(IllegalArgumentException error) {
+            hint.setText(error.getMessage());legacy.setChecked(false);legacy.setEnabled(false);
+            mInsurgence=false;mSiguiente.setEnabled(false);
+        }
+    }
+
     private void aviso(String texto)
     {
         com.google.android.material.snackbar.Snackbar.make(findViewById(R.id.raiz), texto, com.google.android.material.snackbar.Snackbar.LENGTH_LONG).show();
@@ -654,6 +682,8 @@ public class MainActivity extends AppCompatActivity
                 d.versionCode = Constructor.versionCodeAhora();
                 d.ahorrar = mAhorrar;
                 d.insurgence = mInsurgence;
+                d.motor = mMotor;
+                registro.append("Motor: ").append(Motor.detectar(mJuego,mMotor).nombre()).append("\n");
                 registro.append("Perfil Insurgence experimental: ").append(mInsurgence).append("\n");
                 if (mSoundfont != null) {
                     File sf2 = new File(getCacheDir(), "elegida.sf2");
