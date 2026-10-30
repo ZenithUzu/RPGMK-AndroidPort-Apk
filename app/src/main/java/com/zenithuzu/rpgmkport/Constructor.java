@@ -224,6 +224,7 @@ public final class Constructor
         if (!conf.has("windowTitle")) conf.put("windowTitle", titulo);
         if (!conf.has("subImageFix")) conf.put("subImageFix", true);
         conf.put("fullscreen", true);
+        conf.put("vsync", false); // el control de FPS de Android lleva el reloj
         conf.put("syncToRefreshrate", false); // en RPG Maker, más fps = juego más rápido
         JSONArray pre = new JSONArray();
         for (String s : parches)
