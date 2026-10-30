@@ -37,6 +37,7 @@ public final class Constructor
         public long versionCode;
         public byte[] iconoPng;          // null = el icono de la plantilla
         public byte[] fondoPng;          // fondo del icono (gris, negro o blanco); null = el de la plantilla
+        public boolean insurgence;       // opt-in legacy Essentials compatibility profile
         public boolean ahorrar;          // "Ahorrar espacio": Graphics/Audio se leen del APK
         public File soundfont;           // null = el SoundFont que ya venga en el juego
         public List<String> abis = new ArrayList<>(); // vacía = todas las de la plantilla
@@ -129,6 +130,10 @@ public final class Constructor
             apk.add(new FileInputSource(d.soundfont, "assets/game/soundfont.sf2"));
         }
         apk.add(new ByteInputSource(mkxpJson(juego, d.titulo, parches, d.soundfont != null).getBytes(StandardCharsets.US_ASCII), "assets/game/mkxp.json"));
+        apk.removeInputSource("assets/game/rmxp_insurgence.txt");
+        apk.add(new ByteInputSource((d.insurgence ? "1\n" : "0\n").getBytes(StandardCharsets.US_ASCII),
+            "assets/game/rmxp_insurgence.txt"));
+        if (d.insurgence) p.paso("Perfil Insurgence experimental: Ruby antiguo, caché, GIF y mapas planos");
         if (d.ahorrar) {
             Collections.sort(ligero);
             apk.add(new ByteInputSource((String.join("\n", ligero) + "\n").getBytes(StandardCharsets.UTF_8), "assets/game/rmxp_ligero.txt"));
@@ -181,7 +186,7 @@ public final class Constructor
     {
         for (String r : o.archivos()) {
             String bajo = r.toLowerCase(Locale.ROOT);
-            if (termina(bajo, FUERA) || bajo.equals("mkxp.json"))
+            if (termina(bajo, FUERA) || bajo.equals("mkxp.json") || bajo.equals("rmxp_insurgence.txt"))
                 continue;
             InputSource s = o instanceof Origen.Carpeta
                 ? new FileInputSource(((Origen.Carpeta) o).archivo(r), "assets/game/" + r)

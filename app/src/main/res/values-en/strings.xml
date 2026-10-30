@@ -86,4 +86,6 @@
     <string name="source_folder_title">Folder</string>
     <string name="source_zip_hint">Compressed game</string>
     <string name="source_folder_hint">Extracted game</string>
+    <string name="insurgence">Insurgence and derivatives (experimental)</string>
+    <string name="insurgence_sub">For Insurgence/Detergent: adapts legacy Ruby, cache and GIF loading; H-mode7 uses flat maps. Not all mods are guaranteed.</string>
 </resources>

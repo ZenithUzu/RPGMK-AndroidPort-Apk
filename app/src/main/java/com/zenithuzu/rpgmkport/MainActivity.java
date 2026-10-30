@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity
     private Juego.Info mInfo;
     private Uri mIcono, mSoundfont;
     private int mOrientacion;
-    private boolean mAhorrar, mUniversal, mOcupado;
+    private boolean mAhorrar, mUniversal, mOcupado, mInsurgence;
     private int mFondo;             // fondo del icono: 0 gris, 1 negro, 2 blanco
     private static final int[] FONDOS = { 0xFF5F6368, 0xFF000000, 0xFFFFFFFF };
 
@@ -124,6 +124,7 @@ public class MainActivity extends AppCompatActivity
                 if (state.getString("icono") != null) mIcono = Uri.parse(state.getString("icono"));
                 if (state.getString("soundfont") != null) mSoundfont = Uri.parse(state.getString("soundfont"));
                 mAhorrar = state.getBoolean("ahorrar");
+                mInsurgence = state.getBoolean("insurgence");
                 mUniversal = state.getBoolean("universal");
                 mFondo = Math.max(0, Math.min(FONDOS.length - 1, state.getInt("fondo")));
                 if (state.getString("apk") != null) mApk = new File(state.getString("apk"));
@@ -143,6 +144,7 @@ public class MainActivity extends AppCompatActivity
         guardarDatos();
         out.putInt("paso", mPaso);
         out.putBoolean("ahorrar", mAhorrar);
+        out.putBoolean("insurgence", mInsurgence);
         out.putBoolean("universal", mUniversal);
         out.putInt("fondo", mFondo);
         if (mInfo != null) {
@@ -397,6 +399,9 @@ public class MainActivity extends AppCompatActivity
         ((TextInputEditText) v.findViewById(R.id.campo_nombre)).setText(mInfo.titulo);
         ((TextInputEditText) v.findViewById(R.id.campo_autor)).setText(mInfo.autor);
         ((TextInputEditText) v.findViewById(R.id.campo_version)).setText(mInfo.version);
+        MaterialSwitch insurgence = v.findViewById(R.id.insurgence);
+        insurgence.setChecked(mInsurgence);
+        insurgence.setOnCheckedChangeListener((b, on) -> mInsurgence = on);
         MaterialSwitch ahorrar = v.findViewById(R.id.ahorrar);
         ahorrar.setChecked(mAhorrar);
         ahorrar.setOnCheckedChangeListener((b, on) -> mAhorrar = on);
@@ -648,6 +653,8 @@ public class MainActivity extends AppCompatActivity
                 d.version = mInfo.version.isEmpty() ? "1.0" : mInfo.version;
                 d.versionCode = Constructor.versionCodeAhora();
                 d.ahorrar = mAhorrar;
+                d.insurgence = mInsurgence;
+                registro.append("Perfil Insurgence experimental: ").append(mInsurgence).append("\n");
                 if (mSoundfont != null) {
                     File sf2 = new File(getCacheDir(), "elegida.sf2");
                     try (java.io.InputStream in = getContentResolver().openInputStream(mSoundfont);

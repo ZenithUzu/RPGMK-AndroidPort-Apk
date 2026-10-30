@@ -91,4 +91,6 @@
     <string name="source_folder_title">Carpeta</string>
     <string name="source_zip_hint">Juego comprimido</string>
     <string name="source_folder_hint">Juego extraído</string>
+    <string name="insurgence">Insurgence y derivados (experimental)</string>
+    <string name="insurgence_sub">Para Insurgence/Detergent: adapta Ruby antiguo, caché y GIF; H-mode7 usa mapas planos. No garantiza todos los mods.</string>
 </resources>

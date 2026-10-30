@@ -146,3 +146,13 @@ La plantilla compartida incorpora paneles laterales para el color y la opacidad 
 La plantilla incorpora la corrección del inicio RGSS Linker/FmodEx y un respaldo de mapas planos para H-mode7, junto con captura de botones, teclas y ejes y búsqueda de destinos y acciones de la app. Se conservan los perfiles existentes y los colores dinámicos. Consulta el [alcance de compatibilidad con Insurgence](https://github.com/ZenithUzu/portemon-pc/blob/main/docs/compatibilidad-insurgence.md); no se ha verificado el juego completo ni todos sus forks. Vuelve a crear el APK del juego con la misma firma para aplicar la plantilla nueva.
 
 Al abrir el menú se liberan las teclas físicas que seguían pulsadas; el teclado y el mando conservan por separado la propiedad de una misma tecla.
+
+### Insurgence y derivados: perfil experimental (0.12)
+
+En el paso **Datos**, activa **Insurgence y derivados (experimental)** antes de crear el APK.
+Requiere motor-v15 y reconstruir el APK conservando la misma firma. Adapta la caché
+WeakRef y APIs de Ruby antiguo, usa GIF nativos sin gif.dll y mapas planos en lugar
+de H-mode7, además de los reemplazos existentes de RGSS Linker y audio. No garantiza
+todos los forks, plugins ni funciones online; no incluye el runtime privado de Kirin.
+
+[Alcance y fuentes](https://github.com/ZenithUzu/portemon-pc/blob/main/docs/compatibilidad-insurgence.md).

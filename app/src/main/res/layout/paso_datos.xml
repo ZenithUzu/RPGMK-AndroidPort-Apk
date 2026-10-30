@@ -66,4 +66,17 @@
             android:text="@string/ahorrar_sub"
             android:textAppearance="?attr/textAppearanceBodyMedium"
             android:textColor="?attr/colorOnSurfaceVariant" />
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/insurgence"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/insurgence"
+            android:textAppearance="?attr/textAppearanceTitleMedium" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/insurgence_sub"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant" />
 </LinearLayout>
