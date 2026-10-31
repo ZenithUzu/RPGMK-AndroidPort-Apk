@@ -65,7 +65,7 @@ public final class Constructor
     {
         Motor motor = Motor.detectar(juego,d.motor);
         if(d.insurgence && motor.rgss!=1)throw new IllegalArgumentException("El perfil Insurgence es solo para RPG Maker XP.");
-        p.paso("Motor: "+motor.nombre()+" · RGSS"+motor.rgss+" · mkxp-z");
+        p.paso("Motor: "+motor.nombre()+(motor.web()?" · Android System WebView":" · RGSS"+motor.rgss+" · mkxp-z"));
         p.paso("Leyendo la plantilla…");
         ApkModule apk = ApkModule.loadApkFile(plantilla);
         File sinFirma = new File(salida.getPath() + ".sinfirma");
@@ -110,44 +110,53 @@ public final class Constructor
 
         p.paso("Agregando el juego…");
         List<String> ligero = new ArrayList<>();
-        agregar(apk, juego, ligero, d.ahorrar);
+        agregar(apk, juego, ligero, !motor.web() && d.ahorrar);
 
-        // La plantilla tiene prioridad sobre parches antiguos que traiga el juego, igual que en PC.
-        List<String> parches = new ArrayList<>();
-        for (InputSource s : apk.getInputSources()) {
-            String n = s.getAlias();
-            if (!n.startsWith("assets/rmxp/"))
-                continue;
-            String resto = n.substring("assets/rmxp/".length());
-            if (resto.startsWith("patches/")) {
-                resto = resto.substring("patches/".length());
-                parches.add(resto);
+        if(motor.web()) {
+            JSONObject runtime=new JSONObject().put("engine","mv").put("root",motor.webRoot);
+            apk.add(new ByteInputSource(runtime.toString().getBytes(StandardCharsets.UTF_8),"assets/game/portemon_runtime.json"));
+            apk.removeDir("assets/rmxp");
+            apk.removeDir("assets/game/save");
+            apk.removeDir("assets/game/www/save");
+        } else {
+            // La plantilla tiene prioridad sobre parches antiguos que traiga el juego, igual que en PC.
+            List<String> parches = new ArrayList<>();
+            for (InputSource s : apk.getInputSources()) {
+                String n = s.getAlias();
+                if (!n.startsWith("assets/rmxp/"))
+                    continue;
+                String resto = n.substring("assets/rmxp/".length());
+                if (resto.startsWith("patches/")) {
+                    resto = resto.substring("patches/".length());
+                    parches.add(resto);
+                }
+                apk.removeInputSource(n);
+                apk.removeInputSource("assets/game/" + resto);
+                apk.add(new RenamedInputSource<>("assets/game/" + resto, s));
             }
-            apk.removeInputSource(n);
-            apk.removeInputSource("assets/game/" + resto);
-            apk.add(new RenamedInputSource<>("assets/game/" + resto, s));
-        }
-        Collections.sort(parches);
+            Collections.sort(parches);
 
-        if (d.soundfont != null) {
-            apk.removeInputSource("assets/game/soundfont.sf2");
-            apk.add(new FileInputSource(d.soundfont, "assets/game/soundfont.sf2"));
-        }
-        JSONObject conf = new JSONObject(mkxpJson(juego, d.titulo, parches, d.soundfont != null));
-        conf.put("rgssVersion",motor.rgss);
-        apk.add(new ByteInputSource(escaparJson(conf.toString()).getBytes(StandardCharsets.US_ASCII), "assets/game/mkxp.json"));
-        String ini = juego.buscar("Game.ini");
-        apk.removeInputSource("assets/game/"+ini);
-        apk.add(new ByteInputSource(motor.ini(Juego.leerTexto(juego,ini),d.titulo).getBytes(StandardCharsets.UTF_8),"assets/game/Game.ini"));
-        apk.removeInputSource("assets/game/rmxp_motor.txt");
-        apk.add(new ByteInputSource((motor.rgss+"\n").getBytes(StandardCharsets.US_ASCII),"assets/game/rmxp_motor.txt"));
-        apk.removeInputSource("assets/game/rmxp_insurgence.txt");
-        apk.add(new ByteInputSource((d.insurgence ? "1\n" : "0\n").getBytes(StandardCharsets.US_ASCII),
-            "assets/game/rmxp_insurgence.txt"));
-        if (d.insurgence) p.paso("Perfil Insurgence experimental: Ruby antiguo, caché, GIF y mapas planos");
-        if (d.ahorrar) {
-            Collections.sort(ligero);
-            apk.add(new ByteInputSource((String.join("\n", ligero) + "\n").getBytes(StandardCharsets.UTF_8), "assets/game/rmxp_ligero.txt"));
+            if (d.soundfont != null) {
+                apk.removeInputSource("assets/game/soundfont.sf2");
+                apk.add(new FileInputSource(d.soundfont, "assets/game/soundfont.sf2"));
+            }
+            JSONObject conf = new JSONObject(mkxpJson(juego, d.titulo, parches, d.soundfont != null));
+            conf.put("rgssVersion",motor.rgss);
+            apk.add(new ByteInputSource(escaparJson(conf.toString()).getBytes(StandardCharsets.US_ASCII), "assets/game/mkxp.json"));
+            String ini = juego.buscar("Game.ini");
+            apk.removeInputSource("assets/game/"+ini);
+            apk.add(new ByteInputSource(motor.ini(Juego.leerTexto(juego,ini),d.titulo).getBytes(StandardCharsets.UTF_8),"assets/game/Game.ini"));
+            apk.removeInputSource("assets/game/rmxp_motor.txt");
+            apk.add(new ByteInputSource((motor.rgss+"\n").getBytes(StandardCharsets.US_ASCII),"assets/game/rmxp_motor.txt"));
+            apk.removeInputSource("assets/game/rmxp_insurgence.txt");
+            apk.add(new ByteInputSource((d.insurgence ? "1\n" : "0\n").getBytes(StandardCharsets.US_ASCII),
+                "assets/game/rmxp_insurgence.txt"));
+            if (d.insurgence) p.paso("Perfil Insurgence experimental: Ruby antiguo, caché, GIF y mapas planos");
+            if (d.ahorrar) {
+                Collections.sort(ligero);
+                apk.add(new ByteInputSource((String.join("\n", ligero) + "\n").getBytes(StandardCharsets.UTF_8), "assets/game/rmxp_ligero.txt"));
+            }
+
         }
 
         p.paso("Escribiendo el APK…");
@@ -197,7 +206,7 @@ public final class Constructor
     {
         for (String r : o.archivos()) {
             String bajo = r.toLowerCase(Locale.ROOT);
-            if (termina(bajo, FUERA) || bajo.equals("mkxp.json") || bajo.equals("rmxp_insurgence.txt") || bajo.equals("rmxp_motor.txt"))
+            if (termina(bajo, FUERA) || bajo.equals("mkxp.json") || bajo.equals("rmxp_insurgence.txt") || bajo.equals("rmxp_motor.txt") || bajo.equals("portemon_runtime.json"))
                 continue;
             InputSource s = o instanceof Origen.Carpeta
                 ? new FileInputSource(((Origen.Carpeta) o).archivo(r), "assets/game/" + r)

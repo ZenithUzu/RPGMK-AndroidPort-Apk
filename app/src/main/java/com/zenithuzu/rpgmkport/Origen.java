@@ -87,7 +87,7 @@ public abstract class Origen implements java.io.Closeable
             for (Enumeration<org.apache.commons.compress.archivers.zip.ZipArchiveEntry> en = zip.getEntries(); en.hasMoreElements(); ) {
                 String n = en.nextElement().getName();
                 String bajo = n.toLowerCase(Locale.ROOT);
-                if ((bajo.equals("game.ini") || bajo.endsWith("/game.ini")) && n.split("/").length <= 4
+                if ((bajo.equals("game.ini") || bajo.endsWith("/game.ini") || ((bajo.equals("index.html") || bajo.endsWith("/index.html")) && zip.getEntry(n.substring(0,n.length()-10)+"js/rpg_core.js")!=null)) && n.split("/").length <= 4
                     && (ini == null || n.length() < ini.length()))
                     ini = n;
             }
@@ -95,7 +95,7 @@ public abstract class Origen implements java.io.Closeable
                 zip.close();
                 throw new Juego.SinGameIni();
             }
-            prefijo = ini.substring(0, ini.length() - "game.ini".length());
+            prefijo = ini.substring(0, ini.length() - (ini.toLowerCase(Locale.ROOT).endsWith("index.html")?10:8));
             for (Enumeration<org.apache.commons.compress.archivers.zip.ZipArchiveEntry> en = zip.getEntries(); en.hasMoreElements(); ) {
                 org.apache.commons.compress.archivers.zip.ZipArchiveEntry e = en.nextElement();
                 if (!e.isDirectory() && e.getName().startsWith(prefijo) && !e.getName().contains("../"))

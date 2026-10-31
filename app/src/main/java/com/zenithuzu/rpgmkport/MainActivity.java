@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity
                 if (state.getString("soundfont") != null) mSoundfont = Uri.parse(state.getString("soundfont"));
                 mAhorrar = state.getBoolean("ahorrar");
                 mInsurgence = state.getBoolean("insurgence");
-                mMotor = Math.max(0,Math.min(3,state.getInt("motor")));
+                mMotor = Math.max(0,Math.min(4,state.getInt("motor")));
                 mUniversal = state.getBoolean("universal");
                 mFondo = Math.max(0, Math.min(FONDOS.length - 1, state.getInt("fondo")));
                 if (state.getString("apk") != null) mApk = new File(state.getString("apk"));
@@ -408,7 +408,7 @@ public class MainActivity extends AppCompatActivity
         insurgence.setChecked(mInsurgence);
         insurgence.setOnCheckedChangeListener((b, on) -> mInsurgence = on);
         android.widget.AutoCompleteTextView motor = v.findViewById(R.id.motor_juego);
-        String[] engines={getString(R.string.motor_auto),Motor.NOMBRES[1],Motor.NOMBRES[2],Motor.NOMBRES[3]};
+        String[] engines={getString(R.string.motor_auto),Motor.NOMBRES[1],Motor.NOMBRES[2],Motor.NOMBRES[3],Motor.NOMBRES[4]};
         motor.setAdapter(new android.widget.ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,engines));
         motor.setText(engines[mMotor],false);
         motor.setOnItemClickListener((parent,view,position,id)->{mMotor=position;actualizarMotor(v);});
@@ -590,7 +590,7 @@ public class MainActivity extends AppCompatActivity
         try {
             Motor engine=Motor.detectar(mJuego,mMotor);
             mInfo.motor=engine.nombre();
-            hint.setText(getString(R.string.motor_runtime,engine.nombre(),engine.rgss));
+            hint.setText(engine.web()?getString(R.string.motor_mv_runtime):getString(R.string.motor_runtime,engine.nombre(),engine.rgss));
             legacy.setEnabled(engine.rgss==1);
             if(engine.rgss!=1){mInsurgence=false;legacy.setChecked(false);}
             mSiguiente.setEnabled(!mOcupado);

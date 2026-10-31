@@ -129,7 +129,7 @@ public final class Juego
     public static Origen abrirCarpeta(Context c, Uri arbol, Progreso p) throws IOException
     {
         Arbol a = new Arbol(c, arbol, p);
-        if (a.buscar("Game.ini") == null)
+        if (a.buscar("Game.ini") == null && a.buscar("js/rpg_core.js")==null && a.buscar("www/js/rpg_core.js")==null)
             throw new SinGameIni();
         return a;
     }
@@ -166,13 +166,18 @@ public final class Juego
         private String[] buscarRaiz(String id, int nivel)
         {
             List<String[]> dirs = new ArrayList<>();
+            boolean webIndex=false;
             try (Cursor cur = hijos(id)) {
                 while (cur != null && cur.moveToNext()) {
                     if (cur.getString(1).equalsIgnoreCase("Game.ini"))
                         return new String[] { id, nombreDoc(id) };
+                    if(cur.getString(1).equalsIgnoreCase("index.html"))webIndex=true;
                     if (DocumentsContract.Document.MIME_TYPE_DIR.equals(cur.getString(2)))
-                        dirs.add(new String[] { cur.getString(0) });
+                        dirs.add(new String[] { cur.getString(0),cur.getString(1) });
                 }
+            }
+            if(webIndex)for(String[] dir:dirs)if(dir[1].equals("js"))try(Cursor cur=hijos(dir[0])) {
+                while(cur!=null && cur.moveToNext())if(cur.getString(1).equals("rpg_core.js"))return new String[]{id,nombreDoc(id)};
             }
             if (nivel < 3)
                 for (String[] d : dirs) {
@@ -254,6 +259,14 @@ public final class Juego
             if (m.find())
                 info.titulo = m.group(1);
         }
+        for(String prefix:new String[]{"","www/"}) {
+            String system=o.buscar(prefix+"data/System.json");
+            if(system!=null && o.buscar(prefix+"js/rpg_core.js")!=null)try {
+                String title=new org.json.JSONObject(leerTexto(o,system)).optString("gameTitle");
+                if(!title.isEmpty())info.titulo=title;
+            } catch(org.json.JSONException ignored) { }
+        }
+        if(info.motor.contains("MV"))info.avisos.add("MV experimental: WebView actualizado; sin plugins de Node.js/NW.js ni funciones en línea.");
         for (String f : textos(o)) {
             for (String linea : leerTexto(o, f).split("\\r?\\n")) {
                 linea = linea.trim();

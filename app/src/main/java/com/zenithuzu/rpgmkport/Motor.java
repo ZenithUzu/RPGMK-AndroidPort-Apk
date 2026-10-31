@@ -6,14 +6,16 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-/** Runtime selection shared by import reporting and APK construction. Only RGSS is executable today. */
+/** Runtime selection shared by import reporting and APK construction. RGSS and experimental MV have separate runtime hosts. */
 public final class Motor {
-    public static final String[] NOMBRES = {"", "RPG Maker XP", "RPG Maker VX", "RPG Maker VX Ace"};
+    public static final String[] NOMBRES = {"", "RPG Maker XP", "RPG Maker VX", "RPG Maker VX Ace", "RPG Maker MV (experimental)"};
     private static final String[] EXT = {"", "rxdata", "rvdata", "rvdata2"};
     private static final String[] ARCHIVO = {"", "Game.rgssad", "Game.rgss2a", "Game.rgss3a"};
     private static final String[] LIBRARY = {"", "RGSS102E.dll", "RGSS202E.dll", "RGSS301.dll"};
     public final int rgss;
     public final String scripts;
+    public String webRoot="";
+    public boolean web() { return rgss==4; }
 
     private Motor(int rgss, String scripts) { this.rgss=rgss; this.scripts=scripts; }
     public String nombre() { return NOMBRES[rgss]; }
@@ -40,9 +42,17 @@ public final class Motor {
         return 0;
     }
     public static Motor detectar(Origen source, int selected) {
-        if(selected<0 || selected>3)throw new IllegalArgumentException("Motor desconocido");
+        if(selected<0 || selected>4)throw new IllegalArgumentException("Motor desconocido");
+        for(String prefix:new String[]{"","www/"}) {
+            if(source.buscar(prefix+"index.html")!=null && source.buscar(prefix+"js/rpg_core.js")!=null
+                    && source.buscar(prefix+"js/rpg_managers.js")!=null && source.buscar(prefix+"data/System.json")!=null
+                    && (selected==0 || selected==4)) {
+                Motor mv=new Motor(4,"");mv.webRoot=prefix;return mv;
+            }
+        }
+        if(selected==4)throw new IllegalArgumentException("MV necesita index.html, js/rpg_core.js, js/rpg_managers.js y data/System.json en la raíz o www/.");
         String ini=source.buscar("Game.ini");
-        if(ini==null)throw new IllegalArgumentException("Falta Game.ini. Se admiten RPG Maker XP, VX y VX Ace.");
+        if(ini==null)throw new IllegalArgumentException("No encontré datos de XP, VX, VX Ace o MV.");
         Map<String,String> values=datos(Juego.leerTexto(source,ini));
         String declared=unquote(values.getOrDefault("scripts","")).replace('\\','/');
         while(declared.startsWith("./"))declared=declared.substring(2);

@@ -5,13 +5,13 @@
     <string name="atras">Back</string>
 
     <string name="juego_titulo">Source files</string>
-    <string name="juego_texto">Open the ZIP or folder containing Game.ini. Your original files are preserved.</string>
+    <string name="juego_texto">Open the game ZIP or folder: Game.ini (XP/VX/Ace) or index.html (MV). Your original files are preserved.</string>
     <string name="importar_zip">Import a .zip</string>
     <string name="importar_zip_sub">The file as you downloaded it</string>
     <string name="elegir_carpeta">Choose a folder</string>
     <string name="elegir_carpeta_sub">If it is already unzipped</string>
     <string name="copiando">Copying… %1$d files</string>
-    <string name="sin_game_ini">Game.ini not found. Choose the game folder (or a .zip that has it).</string>
+    <string name="sin_game_ini">No XP/VX/VX Ace or MV game found. Choose its folder or ZIP.</string>
     <string name="error">Could not do it: %1$s</string>
     <string name="juego_listo">%1$s · %2$s</string>
     <string name="falta_juego">Choose a game to continue</string>
@@ -46,7 +46,7 @@
     <string name="permiso_instalar">Android asks you to allow this app to install apps. Turn it on, come back and tap Create again.</string>
     <string name="guardar_apk">Save the APK</string>
     <string name="apk_guardado">APK saved</string>
-    <string name="lema">Turn RPG Maker XP, VX and VX Ace games into an APK with their own name, icon and signing key.</string>
+    <string name="lema">Turn RPG Maker XP, VX, VX Ace and experimental MV games into an APK with their own name, icon and signing key.</string>
     <string name="como_funciona">How it works</string>
     <string name="como_1">Choose the game: its .zip or folder</string>
     <string name="como_2">Check name, author, icon and signature</string>
@@ -91,4 +91,5 @@
     <string name="motor_juego">Game engine</string>
     <string name="motor_auto">Automatic</string>
     <string name="motor_runtime">%1$s · RGSS%2$d · mkxp-z. Plugins and DLLs may require adaptations.</string>
+    <string name="motor_mv_runtime">Experimental MV · Android System WebView. Node.js/NW.js plugins and online features are unsupported.</string>
 </resources>

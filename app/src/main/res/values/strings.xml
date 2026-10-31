@@ -6,7 +6,7 @@
     <string name="atras">Atrás</string>
 
     <string name="juego_titulo">Archivos de origen</string>
-    <string name="juego_texto">Abre el ZIP o la carpeta que contiene Game.ini. El original se conserva.</string>
+    <string name="juego_texto">Abre el ZIP o la carpeta del juego: Game.ini (XP/VX/Ace) o index.html (MV). El original se conserva.</string>
     <string name="importar_zip">Importar un .zip</string>
     <string name="importar_zip_sub">El archivo tal como lo descargaste</string>
     <string name="elegir_carpeta">Elegir una carpeta</string>
@@ -17,7 +17,7 @@
     <string name="compatible">Nada raro de Windows encontrado</string>
     <string name="nueva_version">Hay una versión nueva de la app</string>
     <string name="descargar">Descargar</string>
-    <string name="sin_game_ini">No encontré Game.ini. Elige la carpeta del juego (o un .zip que la tenga).</string>
+    <string name="sin_game_ini">No encontré un juego XP/VX/VX Ace o MV. Elige su carpeta o ZIP.</string>
     <string name="error">No se pudo: %1$s</string>
     <string name="juego_listo">%1$s · %2$s</string>
     <string name="falta_juego">Elige un juego para continuar</string>
@@ -52,7 +52,7 @@
     <string name="permiso_instalar">Android pide permitir que esta app instale apps. Actívalo, vuelve y presiona Crear otra vez.</string>
     <string name="guardar_apk">Guardar el APK</string>
     <string name="apk_guardado">APK guardado</string>
-    <string name="lema">Convierte juegos de RPG Maker XP, VX y VX Ace en un APK con su nombre, icono y firma.</string>
+    <string name="lema">Convierte juegos de RPG Maker XP, VX, VX Ace y MV experimental en un APK con su nombre, icono y firma.</string>
     <string name="como_funciona">Así funciona</string>
     <string name="como_1">Elige el juego: el .zip o su carpeta</string>
     <string name="como_2">Revisa nombre, autor, icono y firma</string>
@@ -96,4 +96,5 @@
     <string name="motor_juego">Motor del juego</string>
     <string name="motor_auto">Automático</string>
     <string name="motor_runtime">%1$s · RGSS%2$d · mkxp-z. Los plugins y las DLL pueden requerir adaptaciones.</string>
+    <string name="motor_mv_runtime">MV experimental · Android System WebView. Sin plugins de Node.js/NW.js ni funciones en línea.</string>
 </resources>
