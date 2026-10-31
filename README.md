@@ -10,6 +10,15 @@ Usa el motor **mkxp-z** y la plantilla compartida de [Portémon PC](https://gith
 
 > **Estado: experimental y en pruebas.** Crear, firmar e instalar un APK no garantiza compatibilidad con todos los juegos. El rendimiento y las funciones disponibles dependen del juego y del teléfono.
 
+## Corrección 0.16: nueva partida y tamaño de imagen
+
+El perfil experimental Insurgence/Detergent inicializa correctamente la parte
+nativa de LargePlane, cuyo destructor se llama al salir del menú inicial. También
+sincroniza el lienzo del motor con la resolución que declara el juego para evitar
+la imagen reducida y desplazada. Se conservan proporción, estiramiento, controles
+y ajustes de FPS. Reconstruye el APK con el perfil activado y la misma firma.
+Pendiente de comprobar en el teléfono; no se ejecutaron tests, APKs ni emuladores.
+
 ## Corrección 0.15: teclado de Essentials antiguo
 
 Se evita que la lectura Win32 vuelva a entrar en el propio lector de teclado del
